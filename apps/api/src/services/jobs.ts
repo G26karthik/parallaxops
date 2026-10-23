@@ -397,6 +397,28 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
 
     switch (ev.type) {
       case "attempt_started": {
+        // A new attempt means every earlier one is over. An earlier attempt still RUNNING had its
+        // worker lost (crash, kill, heartbeat timeout): record that instead of leaving it dangling.
+        await tx
+          .update(jobAttempts)
+          .set({
+            state: "FAILED",
+            finishedAt: now,
+            failure: {
+              code: "ENGINE_CRASH",
+              message:
+                "Worker stopped reporting (crashed, killed or lost); the attempt was retried.",
+              advice: "No action needed: the workflow engine retried the work automatically.",
+              stage: "worker",
+            },
+          })
+          .where(
+            and(
+              eq(jobAttempts.jobId, row.id),
+              eq(jobAttempts.state, "RUNNING"),
+              lt(jobAttempts.attemptNo, ev.attemptNo),
+            ),
+          );
         await tx
           .insert(jobAttempts)
           .values({
@@ -471,7 +493,12 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
         break;
       }
       case "completed": {
-        const arts = (p.artifacts as ArtifactReport[] | undefined) ?? [];
+        // Artifact keys must live under this job's own tenant prefix. A buggy or compromised worker
+        // can therefore never attach another tenant's objects to this job.
+        const prefix = keys.jobRoot(row.tenantId, row.id);
+        const arts = ((p.artifacts as ArtifactReport[] | undefined) ?? []).filter(
+          (a) => a.key.startsWith(prefix) && !a.key.includes(".."),
+        );
         for (const a of arts) {
           await tx
             .insert(artifacts)

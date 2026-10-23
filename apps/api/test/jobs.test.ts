@@ -137,7 +137,7 @@ describe("state machine via worker events", () => {
   }
 
   it("walks QUEUED -> PREPROCESSING -> RECONSTRUCTING -> EVALUATING -> COMPLETED", async () => {
-    const { c, id } = await queued();
+    const { t, c, id } = await queued();
     h.clock.now = new Date(h.clock.now.getTime() + 5000);
     await ev(id, "attempt_started", { workerId: "w1" });
     expect((await c.get(`/v1/jobs/${id}`)).body.state).toBe("PREPROCESSING");
@@ -154,7 +154,7 @@ describe("state machine via worker events", () => {
         artifacts: [
           {
             kind: "report",
-            key: "k/report.json",
+            key: `tenants/${t}/jobs/${id}/attempt-1/report.json`,
             bytes: 5,
             sha256: "c".repeat(64),
             contentType: "application/json",
@@ -197,6 +197,57 @@ describe("state machine via worker events", () => {
     expect(job.state).toBe("FAILED");
     expect(job.diagnostic.code).toBe("NO_FEATURES");
     expect(job.metrics).toBeNull();
+  });
+
+  it("marks an attempt whose worker vanished as failed when the next attempt starts", async () => {
+    const { c, id } = await queued();
+    await ev(id, "attempt_started", { workerId: "w-dead" });
+    await ev(id, "stage_started", { stage: "feature_matching", state: "RECONSTRUCTING" });
+    // worker is killed here: no attempt_failed is ever sent. Temporal retries on a new worker.
+    await ev(id, "attempt_started", { attemptNo: 2, workerId: "w-alive" });
+    const job = (await c.get(`/v1/jobs/${id}`)).body;
+    expect(
+      job.attempts.map((a: { attemptNo: number; state: string }) => [a.attemptNo, a.state]),
+    ).toEqual([
+      [1, "FAILED"],
+      [2, "RUNNING"],
+    ]);
+    expect(job.attempts[0].failure.message).toMatch(/stopped reporting/);
+  });
+
+  it("ignores artifacts whose keys are outside the job's own tenant prefix", async () => {
+    const { t, c, id } = await queued();
+    const done = await completeJob(h, id, {
+      metrics: { n_points3d: 1 },
+      artifacts: [
+        {
+          kind: "report",
+          key: `tenants/${t}/jobs/${id}/attempt-1/report.json`,
+          bytes: 1,
+          sha256: "a".repeat(64),
+          contentType: "application/json",
+        },
+        {
+          kind: "stolen",
+          key: "tenants/another-tenant-xyz/jobs/other/attempt-1/secret.bin",
+          bytes: 1,
+          sha256: "b".repeat(64),
+          contentType: "application/json",
+        },
+        {
+          kind: "traversal",
+          key: `tenants/${t}/jobs/${id}/../../other/x`,
+          bytes: 1,
+          sha256: "c".repeat(64),
+          contentType: "application/json",
+        },
+      ],
+    });
+    expect(done.jobState).toBe("COMPLETED");
+    const kinds = (await c.get(`/v1/jobs/${id}`)).body.artifacts.map(
+      (a: { kind: string }) => a.kind,
+    );
+    expect(kinds).toEqual(["report"]);
   });
 
   it("records retries as separate immutable attempts and re-queues", async () => {

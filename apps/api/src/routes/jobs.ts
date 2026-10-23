@@ -151,7 +151,9 @@ export function jobRoutes(app: FastifyInstance, ctx: Ctx) {
       .from(artifacts)
       .where(and(eq(artifacts.jobId, jobId), eq(artifacts.tenantId, tenantId)));
     const expires = new Date(ctx.now().getTime() + LIMITS.presignTtlSeconds * 1000);
-    const wanted = kinds ? rows.filter((a) => kinds.includes(a.kind)) : rows;
+    // Defense in depth: never presign an object outside the caller's own tenant prefix.
+    const own = rows.filter((a) => a.objectKey.startsWith(`tenants/${tenantId}/`));
+    const wanted = kinds ? own.filter((a) => kinds.includes(a.kind)) : own;
     return Promise.all(
       wanted.map(async (a) => {
         const filename = a.objectKey.split("/").pop() ?? a.kind;
