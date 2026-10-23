@@ -7,6 +7,8 @@ so a push that passes locally cannot fail CI for a reason this script covers.
 
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 import sys
 import time
@@ -17,12 +19,60 @@ VISION = ROOT / "services" / "vision-worker"
 PY = sys.executable
 
 
+def tool_env() -> dict[str, str]:
+    """Env for the TS steps. Uses the portable Node/pnpm under $PARALLAXOPS_HOME when present
+    (local Windows dev); in CI Node/pnpm are already on PATH. The pnpm store lives outside the repo."""
+    env = dict(os.environ)
+    home = Path(
+        env.get("PARALLAXOPS_HOME")
+        or (
+            Path(env["LOCALAPPDATA"]) / "ParallaxOps"
+            if "LOCALAPPDATA" in env
+            else Path.home() / ".local/share/parallaxops"
+        )
+    )
+    env["PARALLAXOPS_HOME"] = str(home)
+    extra = [
+        str(p)
+        for p in (home / "tools" / "pnpm", *(home / "tools" / "node").glob("node-*"))
+        if p.exists()
+    ]
+    env["PATH"] = os.pathsep.join([*extra, env.get("PATH", "")])
+    return env
+
+
+def ts_steps(fast: bool) -> list[tuple[str, list[str], Path]]:
+    if (
+        not (ROOT / "pnpm-workspace.yaml").exists()
+        or shutil.which("pnpm", path=tool_env()["PATH"]) is None
+    ):
+        return []
+    out = [
+        ("biome (lint+format)", ["pnpm", "exec", "biome", "check", "."], ROOT),
+        (
+            "tsc (typecheck)",
+            ["pnpm", "-r", "--workspace-concurrency=1", "typecheck"],
+            ROOT,
+        ),
+    ]
+    if not fast:
+        out.append(("vitest (unit)", ["pnpm", "-r", "test"], ROOT))
+    return out
+
+
 def steps(fast: bool) -> list[tuple[str, list[str], Path]]:
     workflows = [str(p) for p in sorted((ROOT / ".github" / "workflows").glob("*.yml"))]
     out: list[tuple[str, list[str], Path]] = [
         (
             "workflow schema",
-            [PY, "-m", "check_jsonschema", "--builtin-schema", "vendor.github-workflows", *workflows],
+            [
+                PY,
+                "-m",
+                "check_jsonschema",
+                "--builtin-schema",
+                "vendor.github-workflows",
+                *workflows,
+            ],
             ROOT,
         ),
         ("ruff lint", [PY, "-m", "ruff", "check", "."], VISION),
@@ -39,15 +89,19 @@ def steps(fast: bool) -> list[tuple[str, list[str], Path]]:
                 VISION,
             )
         )
-    return out
+    return [*out, *ts_steps(fast)]
 
 
 def main() -> int:
     fast = "--fast" in sys.argv
     failed: list[str] = []
+    env = tool_env()
     for name, cmd, cwd in steps(fast):
         t = time.perf_counter()
-        res = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)  # noqa: S603
+        exe = shutil.which(cmd[0], path=env["PATH"]) if cmd[0] == "pnpm" else cmd[0]
+        res = subprocess.run(
+            [exe or cmd[0], *cmd[1:]], cwd=cwd, env=env, capture_output=True, text=True
+        )  # noqa: S603
         ok = res.returncode == 0
         print(f"{'ok  ' if ok else 'FAIL'} {name} ({time.perf_counter() - t:.1f}s)")
         if not ok:

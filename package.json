@@ -1,0 +1,25 @@
+{
+  "name": "parallaxops",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local-first distributed 3D reconstruction platform.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.15.0",
+  "scripts": {
+    "lint": "biome check .",
+    "fmt": "biome check --write .",
+    "typecheck": "pnpm -r --workspace-concurrency=1 typecheck",
+    "test": "pnpm -r test",
+    "openapi": "pnpm --filter @parallaxops/api openapi"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.2",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}

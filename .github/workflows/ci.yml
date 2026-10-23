@@ -9,14 +9,22 @@ jobs:
   check:
     name: "checks (same script as the local pre-push hook)"
     runs-on: ubuntu-latest
+    env:
+      # .npmrc keeps the pnpm virtual store under this directory, outside the checkout.
+      PARALLAXOPS_HOME: ${{ runner.temp }}/parallaxops
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "26"
       - name: System libraries required by Open3D wheels on Linux
         run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0 libgomp1 libgl1 libegl1
-      - name: Install
+      - name: Install Python and Node dependencies
         run: |
           uv venv --python 3.14 .venv
           uv pip install --python .venv/bin/python -e "services/vision-worker[dev]" check-jsonschema types-psutil
+          npm install -g pnpm@12.15.0
+          pnpm install --frozen-lockfile
       - name: Run scripts/check.py
         run: .venv/bin/python scripts/check.py
