@@ -55,6 +55,10 @@ def row_from_report(base: dict[str, Any], rep: dict[str, Any]) -> dict[str, Any]
         gt_ate_rmse_all=g.get("ate_rmse_all"),
         gt_ate_over_spread=g.get("ate_rmse_all_over_spread"),
         gt_rot_median_deg=g.get("rotation_error_deg_median"),
+        gt_spread=g.get("gt_camera_spread"),
+        gt_per_image_pos_err={
+            k: v["position_error"] for k, v in (g.get("per_image") or {}).items()
+        },
     )
     return out
 
@@ -149,10 +153,15 @@ def main() -> None:
     )
     p.add_argument("--max-image-size", type=int, default=1600)
     p.add_argument("--variants", nargs="*", default=VARIANTS)
+    p.add_argument(
+        "--out-file",
+        default="runs.jsonl",
+        help="runs_posthoc.jsonl for non-pre-registered re-runs",
+    )
     a = p.parse_args()
 
     OUT.mkdir(parents=True, exist_ok=True)
-    runs = OUT / "runs.jsonl"
+    runs = OUT / a.out_file
     done = (
         {
             (r["scene"], r["variant"], r["arm"], r["rep"])

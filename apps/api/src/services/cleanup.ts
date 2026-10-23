@@ -1,5 +1,5 @@
 import { TERMINAL_STATES } from "@parallaxops/contracts";
-import { and, eq, inArray, isNotNull, lt, notInArray } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, lt } from "drizzle-orm";
 import type { Ctx } from "../context.ts";
 import { schema } from "../db/client.ts";
 
@@ -60,5 +60,3 @@ export async function runCleanup(ctx: Ctx): Promise<CleanupReport> {
   }
   return report;
 }
-
-export { notInArray };

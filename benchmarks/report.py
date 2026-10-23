@@ -187,7 +187,7 @@ def charts(summary: dict[str, Any], scene: str) -> None:
         ax.set_title(title, fontsize=10)
         if log:
             ax.set_yscale("log")
-        ax.legend()
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, frameon=False)
     fig.suptitle(
         f"{scene}: baseline vs controller (bars = mean, whiskers = min-max over repetitions)",
         fontsize=11,

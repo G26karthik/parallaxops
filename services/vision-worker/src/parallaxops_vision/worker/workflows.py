@@ -77,8 +77,10 @@ class ReconstructionWorkflow:
                 # Queue wait is bounded separately from execution time.
                 schedule_to_start_timeout=timedelta(hours=6),
                 start_to_close_timeout=timedelta(minutes=90),
-                # The activity heartbeats every second; a dead worker is detected within this window.
-                heartbeat_timeout=timedelta(seconds=45),
+                # The activity heartbeats every second and the engine is a child process, so the
+                # worker's event loop stays responsive. The SDK throttles heartbeats to 80% of this
+                # value, which also bounds how long a cancel request takes to reach the activity.
+                heartbeat_timeout=timedelta(seconds=10),
                 retry_policy=RetryPolicy(
                     initial_interval=timedelta(seconds=5),
                     backoff_coefficient=2.0,

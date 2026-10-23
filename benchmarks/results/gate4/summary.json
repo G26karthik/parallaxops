@@ -1,0 +1,1298 @@
+{
+  "summary": {
+    "terrace": {
+      "clean": {
+        "baseline": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 5327.333333333333,
+            "min": 5293,
+            "max": 5353,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.8578666666666667,
+            "min": 0.8492,
+            "max": 0.8694,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.0032,
+            "min": 0.00311,
+            "max": 0.00334,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.5306666666666667,
+            "min": 0.524,
+            "max": 0.543,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 57.153333333333336,
+            "min": 55.9,
+            "max": 58.1,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 380.12,
+            "min": 377.28,
+            "max": 383.8,
+            "n": 3
+          }
+        },
+        "controller": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 5329.333333333333,
+            "min": 5300,
+            "max": 5352,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.8568333333333333,
+            "min": 0.8488,
+            "max": 0.8691,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.003193333333333333,
+            "min": 0.00312,
+            "max": 0.00332,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.5226666666666667,
+            "min": 0.514,
+            "max": 0.534,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 55.443333333333335,
+            "min": 50.21,
+            "max": 58.7,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 364.73333333333335,
+            "min": 337.0,
+            "max": 378.6,
+            "n": 3
+          }
+        }
+      },
+      "blur": {
+        "baseline": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 0.3043,
+            "min": 0.3043,
+            "max": 0.3043,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 868.6666666666666,
+            "min": 865,
+            "max": 871,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.7100333333333333,
+            "min": 0.7075,
+            "max": 0.7125,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.0020633333333333333,
+            "min": 0.00193,
+            "max": 0.00218,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.8916666666666667,
+            "min": 0.759,
+            "max": 1.016,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 22.096666666666668,
+            "min": 21.3,
+            "max": 23.1,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 138.88,
+            "min": 134.39,
+            "max": 144.55,
+            "n": 3
+          }
+        },
+        "controller": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 3,
+          "strategies": [
+            "global_mapper",
+            "more_features_and_scale"
+          ],
+          "registered_fraction": {
+            "mean": 0.5797,
+            "min": 0.5652,
+            "max": 0.6087,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 2284.3333333333335,
+            "min": 2269,
+            "max": 2294,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.8092666666666667,
+            "min": 0.7954,
+            "max": 0.8316,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.14473,
+            "min": 0.0077,
+            "max": 0.41573,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 1.785,
+            "min": 1.131,
+            "max": 2.911,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 66.32333333333334,
+            "min": 65.72,
+            "max": 67.46,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 413.26666666666665,
+            "min": 407.0,
+            "max": 418.4,
+            "n": 3
+          }
+        }
+      },
+      "overlap": {
+        "baseline": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 0.5,
+            "min": 0.5,
+            "max": 0.5,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 339,
+            "min": 337,
+            "max": 341,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.6919000000000001,
+            "min": 0.684,
+            "max": 0.6993,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.004426666666666666,
+            "min": 0.00402,
+            "max": 0.00472,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.6923333333333334,
+            "min": 0.643,
+            "max": 0.731,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 9.536666666666667,
+            "min": 8.66,
+            "max": 10.25,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 52.36666666666667,
+            "min": 48.33,
+            "max": 56.36,
+            "n": 3
+          }
+        },
+        "controller": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 3,
+          "strategies": [
+            "global_mapper",
+            "more_features_and_scale"
+          ],
+          "registered_fraction": {
+            "mean": 0.875,
+            "min": 0.625,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 351.6666666666667,
+            "min": 343,
+            "max": 357,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.7048333333333333,
+            "min": 0.6938,
+            "max": 0.7268,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.08801,
+            "min": 0.07771,
+            "max": 0.107,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 1.2850000000000001,
+            "min": 0.717,
+            "max": 1.618,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 30.046666666666667,
+            "min": 28.25,
+            "max": 31.56,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 161.8,
+            "min": 153.8,
+            "max": 172.1,
+            "n": 3
+          }
+        }
+      },
+      "repeats": {
+        "baseline": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 7249.333333333333,
+            "min": 7229,
+            "max": 7263,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.7658333333333334,
+            "min": 0.765,
+            "max": 0.7672,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.0031033333333333334,
+            "min": 0.00304,
+            "max": 0.00317,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.5263333333333333,
+            "min": 0.52,
+            "max": 0.532,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 74.15333333333334,
+            "min": 71.34,
+            "max": 77.46,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 508.86333333333334,
+            "min": 488.06,
+            "max": 531.39,
+            "n": 3
+          }
+        },
+        "controller": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 7225,
+            "min": 7215,
+            "max": 7239,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.7768,
+            "min": 0.7644,
+            "max": 0.7991,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.0034433333333333334,
+            "min": 0.00294,
+            "max": 0.00428,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.5956666666666667,
+            "min": 0.525,
+            "max": 0.73,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 82.16333333333333,
+            "min": 77.64,
+            "max": 88.03,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 527.3,
+            "min": 500.1,
+            "max": 571.3,
+            "n": 3
+          }
+        }
+      },
+      "light": {
+        "baseline": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 4056.3333333333335,
+            "min": 4046,
+            "max": 4065,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.8943,
+            "min": 0.8883,
+            "max": 0.8992,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.004123333333333333,
+            "min": 0.00398,
+            "max": 0.00424,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.6253333333333333,
+            "min": 0.61,
+            "max": 0.635,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 47.016666666666666,
+            "min": 43.47,
+            "max": 51.19,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 324.6666666666667,
+            "min": 301.97,
+            "max": 354.22,
+            "n": 3
+          }
+        },
+        "controller": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 4050.6666666666665,
+            "min": 4044,
+            "max": 4059,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.8997666666666667,
+            "min": 0.897,
+            "max": 0.9014,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.004476666666666667,
+            "min": 0.00441,
+            "max": 0.00453,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.627,
+            "min": 0.625,
+            "max": 0.628,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 45.78,
+            "min": 42.82,
+            "max": 49.47,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 316.6333333333333,
+            "min": 297.6,
+            "max": 338.2,
+            "n": 3
+          }
+        }
+      },
+      "moving": {
+        "baseline": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 0.9855,
+            "min": 0.9565,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 3449.3333333333335,
+            "min": 2271,
+            "max": 4040,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.9388,
+            "min": 0.8753,
+            "max": 1.062,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.19942000000000001,
+            "min": 0.00329,
+            "max": 0.59165,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 59.16733333333333,
+            "min": 0.43,
+            "max": 176.629,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 50.11333333333333,
+            "min": 49.62,
+            "max": 50.57,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 336.3066666666667,
+            "min": 306.36,
+            "max": 352.84,
+            "n": 3
+          }
+        },
+        "controller": {
+          "n_runs": 3,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 3
+          },
+          "n_points3d": {
+            "mean": 4030,
+            "min": 4025,
+            "max": 4039,
+            "n": 3
+          },
+          "reproj_mean_px": {
+            "mean": 0.8780333333333333,
+            "min": 0.8761,
+            "max": 0.8807,
+            "n": 3
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00326,
+            "min": 0.00322,
+            "max": 0.00331,
+            "n": 3
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.43766666666666665,
+            "min": 0.434,
+            "max": 0.44,
+            "n": 3
+          },
+          "wall_s": {
+            "mean": 45.166666666666664,
+            "min": 36.58,
+            "max": 52.31,
+            "n": 3
+          },
+          "cpu_s": {
+            "mean": 310.4,
+            "min": 254.8,
+            "max": 357.7,
+            "n": 3
+          }
+        }
+      }
+    },
+    "relief": {
+      "clean": {
+        "baseline": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 8694,
+            "min": 8694,
+            "max": 8694,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5874,
+            "min": 0.5874,
+            "max": 0.5874,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00387,
+            "min": 0.00387,
+            "max": 0.00387,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.61,
+            "min": 0.61,
+            "max": 0.61,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 35.24,
+            "min": 35.24,
+            "max": 35.24,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 181.73,
+            "min": 181.73,
+            "max": 181.73,
+            "n": 1
+          }
+        },
+        "controller": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 8712,
+            "min": 8712,
+            "max": 8712,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5825,
+            "min": 0.5825,
+            "max": 0.5825,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00369,
+            "min": 0.00369,
+            "max": 0.00369,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.645,
+            "min": 0.645,
+            "max": 0.645,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 39.45,
+            "min": 39.45,
+            "max": 39.45,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 199.1,
+            "min": 199.1,
+            "max": 199.1,
+            "n": 1
+          }
+        }
+      },
+      "blur": {
+        "baseline": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 0.5484,
+            "min": 0.5484,
+            "max": 0.5484,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 4920,
+            "min": 4920,
+            "max": 4920,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5933,
+            "min": 0.5933,
+            "max": 0.5933,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00333,
+            "min": 0.00333,
+            "max": 0.00333,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.685,
+            "min": 0.685,
+            "max": 0.685,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 18.66,
+            "min": 18.66,
+            "max": 18.66,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 90.03,
+            "min": 90.03,
+            "max": 90.03,
+            "n": 1
+          }
+        },
+        "controller": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 3,
+          "strategies": [
+            "global_mapper",
+            "more_features_and_scale"
+          ],
+          "registered_fraction": {
+            "mean": 0.6129,
+            "min": 0.6129,
+            "max": 0.6129,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 7140,
+            "min": 7140,
+            "max": 7140,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.7267,
+            "min": 0.7267,
+            "max": 0.7267,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 14.5932,
+            "min": 14.5932,
+            "max": 14.5932,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.716,
+            "min": 0.716,
+            "max": 0.716,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 86.98,
+            "min": 86.98,
+            "max": 86.98,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 483.7,
+            "min": 483.7,
+            "max": 483.7,
+            "n": 1
+          }
+        }
+      },
+      "overlap": {
+        "baseline": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 0.7273,
+            "min": 0.7273,
+            "max": 0.7273,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 853,
+            "min": 853,
+            "max": 853,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.4304,
+            "min": 0.4304,
+            "max": 0.4304,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00443,
+            "min": 0.00443,
+            "max": 0.00443,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.745,
+            "min": 0.745,
+            "max": 0.745,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 7.07,
+            "min": 7.07,
+            "max": 7.07,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 35.7,
+            "min": 35.7,
+            "max": 35.7,
+            "n": 1
+          }
+        },
+        "controller": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 3,
+          "strategies": [
+            "global_mapper",
+            "more_features_and_scale"
+          ],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 1155,
+            "min": 1155,
+            "max": 1155,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.4967,
+            "min": 0.4967,
+            "max": 0.4967,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 8.90251,
+            "min": 8.90251,
+            "max": 8.90251,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.927,
+            "min": 0.927,
+            "max": 0.927,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 32.66,
+            "min": 32.66,
+            "max": 32.66,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 175.8,
+            "min": 175.8,
+            "max": 175.8,
+            "n": 1
+          }
+        }
+      },
+      "repeats": {
+        "baseline": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 10268,
+            "min": 10268,
+            "max": 10268,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5846,
+            "min": 0.5846,
+            "max": 0.5846,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00426,
+            "min": 0.00426,
+            "max": 0.00426,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.613,
+            "min": 0.613,
+            "max": 0.613,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 58.6,
+            "min": 58.6,
+            "max": 58.6,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 309.45,
+            "min": 309.45,
+            "max": 309.45,
+            "n": 1
+          }
+        },
+        "controller": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 10289,
+            "min": 10289,
+            "max": 10289,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5843,
+            "min": 0.5843,
+            "max": 0.5843,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00505,
+            "min": 0.00505,
+            "max": 0.00505,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.776,
+            "min": 0.776,
+            "max": 0.776,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 63.07,
+            "min": 63.07,
+            "max": 63.07,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 341.5,
+            "min": 341.5,
+            "max": 341.5,
+            "n": 1
+          }
+        }
+      },
+      "light": {
+        "baseline": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 6852,
+            "min": 6852,
+            "max": 6852,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.542,
+            "min": 0.542,
+            "max": 0.542,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00456,
+            "min": 0.00456,
+            "max": 0.00456,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.81,
+            "min": 0.81,
+            "max": 0.81,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 34.1,
+            "min": 34.1,
+            "max": 34.1,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 182.39,
+            "min": 182.39,
+            "max": 182.39,
+            "n": 1
+          }
+        },
+        "controller": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 6840,
+            "min": 6840,
+            "max": 6840,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5414,
+            "min": 0.5414,
+            "max": 0.5414,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.0045,
+            "min": 0.0045,
+            "max": 0.0045,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.731,
+            "min": 0.731,
+            "max": 0.731,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 34.56,
+            "min": 34.56,
+            "max": 34.56,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 181.4,
+            "min": 181.4,
+            "max": 181.4,
+            "n": 1
+          }
+        }
+      },
+      "moving": {
+        "baseline": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 6924,
+            "min": 6924,
+            "max": 6924,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5843,
+            "min": 0.5843,
+            "max": 0.5843,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00409,
+            "min": 0.00409,
+            "max": 0.00409,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.654,
+            "min": 0.654,
+            "max": 0.654,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 32.92,
+            "min": 32.92,
+            "max": 32.92,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 175.34,
+            "min": 175.34,
+            "max": 175.34,
+            "n": 1
+          }
+        },
+        "controller": {
+          "n_runs": 1,
+          "n_failed": 0,
+          "attempts_mean": 1,
+          "strategies": [],
+          "registered_fraction": {
+            "mean": 1.0,
+            "min": 1.0,
+            "max": 1.0,
+            "n": 1
+          },
+          "n_points3d": {
+            "mean": 6924,
+            "min": 6924,
+            "max": 6924,
+            "n": 1
+          },
+          "reproj_mean_px": {
+            "mean": 0.5838,
+            "min": 0.5838,
+            "max": 0.5838,
+            "n": 1
+          },
+          "gt_ate_over_spread": {
+            "mean": 0.00423,
+            "min": 0.00423,
+            "max": 0.00423,
+            "n": 1
+          },
+          "gt_rot_median_deg": {
+            "mean": 0.624,
+            "min": 0.624,
+            "max": 0.624,
+            "n": 1
+          },
+          "wall_s": {
+            "mean": 32.59,
+            "min": 32.59,
+            "max": 32.59,
+            "n": 1
+          },
+          "cpu_s": {
+            "mean": 173.9,
+            "min": 173.9,
+            "max": 173.9,
+            "n": 1
+          }
+        }
+      }
+    }
+  },
+  "verdicts": {
+    "terrace": {
+      "H1": {
+        "verdict": "not supported",
+        "variants": {
+          "blur": {
+            "gain_pp": 27.5,
+            "outside_baseline_range": true,
+            "cost_x": 3.0,
+            "supported": false
+          },
+          "overlap": {
+            "gain_pp": 37.5,
+            "outside_baseline_range": true,
+            "cost_x": 3.15,
+            "supported": false
+          }
+        }
+      },
+      "H2": {
+        "verdict": "supported",
+        "attempts_mean": 1,
+        "overhead_pct": -3.0
+      },
+      "H3": {
+        "verdict": "not supported",
+        "variants": {
+          "clean": {
+            "controller_mean": 0.003193333333333333,
+            "baseline_max": 0.00334,
+            "ok": true
+          },
+          "repeats": {
+            "controller_mean": 0.0034433333333333334,
+            "baseline_max": 0.00317,
+            "ok": false
+          },
+          "light": {
+            "controller_mean": 0.004476666666666667,
+            "baseline_max": 0.00424,
+            "ok": false
+          },
+          "moving": {
+            "controller_mean": 0.00326,
+            "baseline_max": 0.59165,
+            "ok": true
+          }
+        }
+      }
+    },
+    "relief": {
+      "H1": {
+        "verdict": "not supported",
+        "variants": {
+          "blur": {
+            "gain_pp": 6.5,
+            "outside_baseline_range": true,
+            "cost_x": 4.66,
+            "supported": false
+          },
+          "overlap": {
+            "gain_pp": 27.3,
+            "outside_baseline_range": true,
+            "cost_x": 4.62,
+            "supported": false
+          }
+        }
+      },
+      "H2": {
+        "verdict": "not supported",
+        "attempts_mean": 1,
+        "overhead_pct": 11.9
+      },
+      "H3": {
+        "verdict": "not supported",
+        "variants": {
+          "clean": {
+            "controller_mean": 0.00369,
+            "baseline_max": 0.00387,
+            "ok": true
+          },
+          "repeats": {
+            "controller_mean": 0.00505,
+            "baseline_max": 0.00426,
+            "ok": false
+          },
+          "light": {
+            "controller_mean": 0.0045,
+            "baseline_max": 0.00456,
+            "ok": true
+          },
+          "moving": {
+            "controller_mean": 0.00423,
+            "baseline_max": 0.00409,
+            "ok": false
+          }
+        }
+      }
+    }
+  },
+  "n_runs": 48,
+  "n_errors": 0
+}

@@ -1,0 +1,77 @@
+# Container path for the whole stack. STATUS: see infra/README.md for whether this file has been
+# executed on a machine. The native path (scripts/dev.ps1) is the verified default.
+#
+#   docker compose -f infra/docker-compose.yml up --build
+#
+# Open http://localhost:3000. Development credentials only; change them for anything shared.
+name: parallaxops
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: parallaxops
+      POSTGRES_PASSWORD: parallaxops
+      POSTGRES_DB: parallaxops
+    volumes: [pgdata:/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parallaxops"]
+      interval: 5s
+      retries: 20
+
+  s3:
+    image: chrislusf/seaweedfs:latest
+    command: >
+      server -dir=/data -ip=0.0.0.0 -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+      -s3.allowedOrigins=http://localhost:3000 -master.volumeSizeLimitMB=256 -volume.max=30
+    volumes:
+      - s3data:/data
+      - ./docker/s3.json:/etc/seaweedfs/s3.json:ro
+    ports: ["8333:8333"]
+
+  temporal:
+    image: temporalio/temporal:latest
+    command: server start-dev --ip 0.0.0.0 --port 7233 --headless --db-filename /data/temporal.db
+    volumes: [temporaldata:/data]
+
+  api:
+    build: { context: .., dockerfile: infra/docker/api.Dockerfile }
+    environment:
+      DATABASE_URL: postgres://parallaxops:parallaxops@postgres:5432/parallaxops
+      S3_ENDPOINT: http://s3:8333
+      S3_PUBLIC_ENDPOINT: http://localhost:8333
+      TEMPORAL_ADDRESS: temporal:7233
+      INTERNAL_API_SECRET: dev-internal-secret-change-me
+      CORS_ORIGINS: http://localhost:3000
+      NODE_ENV: development
+    depends_on:
+      postgres: { condition: service_healthy }
+      s3: { condition: service_started }
+      temporal: { condition: service_started }
+    ports: ["4000:4000"]
+
+  worker:
+    build: { context: .., dockerfile: infra/docker/worker.Dockerfile }
+    environment:
+      API_URL: http://api:4000
+      S3_ENDPOINT: http://s3:8333
+      TEMPORAL_ADDRESS: temporal:7233
+      INTERNAL_API_SECRET: dev-internal-secret-change-me
+      WORKER_HEAVY_SLOTS: "1"
+    depends_on: [api]
+    deploy:
+      resources:
+        limits: { memory: 12g }
+
+  web:
+    build:
+      context: ..
+      dockerfile: infra/docker/web.Dockerfile
+      args: { NEXT_PUBLIC_API_URL: http://localhost:4000 }
+    depends_on: [api]
+    ports: ["3000:3000"]
+
+volumes:
+  pgdata:
+  s3data:
+  temporaldata:

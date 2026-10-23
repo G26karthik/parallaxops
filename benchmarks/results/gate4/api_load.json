@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "at": "2026-10-23T22:15:27.639628+00:00",
+    "machine": {
+      "logical_cores": 16,
+      "ram_gib": 31.2,
+      "free_ram_gib_at_start": 9.1
+    },
+    "client": "httpx async, same host, loopback, closed loop, zero think time",
+    "mix": {
+      "GET /v1/projects": 5,
+      "GET /v1/jobs/{id}": 5,
+      "GET /v1/projects/{id}/jobs": 2,
+      "POST /v1/projects": 1,
+      "GET /healthz": 1
+    },
+    "note": "HTTP concurrency only. Exactly one reconstruction runs at a time; this is not reconstruction throughput.",
+    "reconstruction_state_when_load_started": "RECONSTRUCTING"
+  },
+  "phases": [
+    {
+      "label": "idle, 1 VUs",
+      "virtual_users": 1,
+      "duration_s": 15.0,
+      "requests": 4404,
+      "throughput_rps": 293.6,
+      "errors": 0,
+      "error_samples": [],
+      "latency_ms": {
+        "p50": 3.33,
+        "p95": 4.95,
+        "p99": 5.73,
+        "max": 48.6
+      },
+      "per_endpoint_p95_ms": {
+        "GET /v1/projects": 5.18,
+        "GET /v1/projects/{id}/jobs": 3.78,
+        "POST /v1/projects": 4.55,
+        "GET /healthz": 2.62
+      },
+      "reconstruction_running": false
+    },
+    {
+      "label": "idle, 8 VUs",
+      "virtual_users": 8,
+      "duration_s": 15.0,
+      "requests": 5430,
+      "throughput_rps": 361.7,
+      "errors": 0,
+      "error_samples": [],
+      "latency_ms": {
+        "p50": 14.11,
+        "p95": 67.83,
+        "p99": 138.0,
+        "max": 610.5
+      },
+      "per_endpoint_p95_ms": {
+        "GET /v1/projects": 67.57,
+        "GET /v1/projects/{id}/jobs": 68.42,
+        "POST /v1/projects": 66.65,
+        "GET /healthz": 68.64
+      },
+      "reconstruction_running": false
+    },
+    {
+      "label": "idle, 32 VUs",
+      "virtual_users": 32,
+      "duration_s": 15.1,
+      "requests": 3812,
+      "throughput_rps": 252.7,
+      "errors": 0,
+      "error_samples": [],
+      "latency_ms": {
+        "p50": 91.44,
+        "p95": 351.43,
+        "p99": 535.77,
+        "max": 923.8
+      },
+      "per_endpoint_p95_ms": {
+        "GET /v1/projects": 349.83,
+        "GET /v1/projects/{id}/jobs": 351.03,
+        "POST /v1/projects": 366.0,
+        "GET /healthz": 331.69
+      },
+      "reconstruction_running": false
+    },
+    {
+      "label": "during reconstruction, 1 VUs",
+      "virtual_users": 1,
+      "duration_s": 15.0,
+      "requests": 3268,
+      "throughput_rps": 217.8,
+      "errors": 0,
+      "error_samples": [],
+      "latency_ms": {
+        "p50": 4.46,
+        "p95": 6.77,
+        "p99": 8.06,
+        "max": 54.8
+      },
+      "per_endpoint_p95_ms": {
+        "GET /v1/projects": 6.0,
+        "GET /v1/jobs/{id}": 7.41,
+        "GET /v1/projects/{id}/jobs": 5.38,
+        "POST /v1/projects": 6.3,
+        "GET /healthz": 3.92
+      },
+      "reconstruction_running": true
+    },
+    {
+      "label": "during reconstruction, 8 VUs",
+      "virtual_users": 8,
+      "duration_s": 15.0,
+      "requests": 3469,
+      "throughput_rps": 230.8,
+      "errors": 0,
+      "error_samples": [],
+      "latency_ms": {
+        "p50": 21.4,
+        "p95": 114.15,
+        "p99": 212.4,
+        "max": 639.7
+      },
+      "per_endpoint_p95_ms": {
+        "GET /v1/projects": 117.17,
+        "GET /v1/jobs/{id}": 108.41,
+        "GET /v1/projects/{id}/jobs": 114.91,
+        "POST /v1/projects": 112.21,
+        "GET /healthz": 158.69
+      },
+      "reconstruction_running": true
+    },
+    {
+      "label": "during reconstruction, 32 VUs",
+      "virtual_users": 32,
+      "duration_s": 15.1,
+      "requests": 3233,
+      "throughput_rps": 214.0,
+      "errors": 0,
+      "error_samples": [],
+      "latency_ms": {
+        "p50": 99.91,
+        "p95": 432.73,
+        "p99": 651.66,
+        "max": 1153.4
+      },
+      "per_endpoint_p95_ms": {
+        "GET /v1/projects": 411.69,
+        "GET /v1/jobs/{id}": 433.05,
+        "GET /v1/projects/{id}/jobs": 424.87,
+        "POST /v1/projects": 508.15,
+        "GET /healthz": 411.9
+      },
+      "reconstruction_running": true
+    }
+  ]
+}

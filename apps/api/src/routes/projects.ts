@@ -18,7 +18,7 @@ import {
   sanitizeFilename,
   WORKFLOW_CONTRACT,
 } from "@parallaxops/contracts";
-import { and, asc, count, desc, eq, inArray, ne, sql, sum } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, ne, sum } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
@@ -476,5 +476,3 @@ export function projectRoutes(app: FastifyInstance, ctx: Ctx) {
     },
   );
 }
-
-export { sql };

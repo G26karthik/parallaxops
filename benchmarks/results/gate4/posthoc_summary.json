@@ -1,0 +1,80 @@
+[
+  {
+    "variant": "blur",
+    "rep": 0,
+    "baseline_registered": 7,
+    "controller_registered": 14,
+    "common": 7,
+    "common_err_over_spread_baseline": 0.0016,
+    "common_err_over_spread_controller": 0.0165,
+    "controller_only": 7,
+    "controller_only_bad": 6,
+    "controller_bad_total": 6,
+    "baseline_bad_total": 0
+  },
+  {
+    "variant": "blur",
+    "rep": 1,
+    "baseline_registered": 7,
+    "controller_registered": 14,
+    "common": 7,
+    "common_err_over_spread_baseline": 0.0015,
+    "common_err_over_spread_controller": 0.0072,
+    "controller_only": 7,
+    "controller_only_bad": 6,
+    "controller_bad_total": 6,
+    "baseline_bad_total": 0
+  },
+  {
+    "variant": "blur",
+    "rep": 2,
+    "baseline_registered": 7,
+    "controller_registered": 13,
+    "common": 7,
+    "common_err_over_spread_baseline": 0.0017,
+    "common_err_over_spread_controller": 0.0138,
+    "controller_only": 6,
+    "controller_only_bad": 0,
+    "controller_bad_total": 0,
+    "baseline_bad_total": 0
+  },
+  {
+    "variant": "overlap",
+    "rep": 0,
+    "baseline_registered": 4,
+    "controller_registered": 8,
+    "common": 4,
+    "common_err_over_spread_baseline": 0.0035,
+    "common_err_over_spread_controller": 0.0082,
+    "controller_only": 4,
+    "controller_only_bad": 1,
+    "controller_bad_total": 1,
+    "baseline_bad_total": 0
+  },
+  {
+    "variant": "overlap",
+    "rep": 1,
+    "baseline_registered": 4,
+    "controller_registered": 8,
+    "common": 4,
+    "common_err_over_spread_baseline": 0.0037,
+    "common_err_over_spread_controller": 0.0083,
+    "controller_only": 4,
+    "controller_only_bad": 1,
+    "controller_bad_total": 1,
+    "baseline_bad_total": 0
+  },
+  {
+    "variant": "overlap",
+    "rep": 2,
+    "baseline_registered": 4,
+    "controller_registered": 8,
+    "common": 4,
+    "common_err_over_spread_baseline": 0.0037,
+    "common_err_over_spread_controller": 0.0082,
+    "controller_only": 4,
+    "controller_only_bad": 1,
+    "controller_bad_total": 1,
+    "baseline_bad_total": 0
+  }
+]
