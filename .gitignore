@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Local state and secrets (all runtime state lives under $PARALLAXOPS_HOME, outside the repo)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.tools/
+data/
+scratch/
+runs/
+
+# Large generated artifacts are published via benchmarks/results manifests, not blobs
+*.ply
+*.7z
+*.zip
+!docs/assets/**/*.png
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Internal engineering brief (not part of the published project)
+ParallaxOps_Coding_Agent_Master_Brief.md

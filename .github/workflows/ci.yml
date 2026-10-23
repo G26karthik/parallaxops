@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  vision:
+    name: vision worker (CPU, no GPU, no downloads)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install
+        run: |
+          uv venv --python 3.14 .venv
+          uv pip install --python .venv/bin/python -e "services/vision-worker[dev]"
+      - name: Lint
+        run: |
+          cd services/vision-worker
+          ../../.venv/bin/python -m ruff check .
+          ../../.venv/bin/python -m ruff format --check .
+      - name: Types
+        run: cd services/vision-worker && ../../.venv/bin/python -m mypy
+      - name: Unit tests (integration tests skip: dataset not downloaded)
+        run: cd services/vision-worker && ../../.venv/bin/python -m pytest -m "not integration and not gpu"
