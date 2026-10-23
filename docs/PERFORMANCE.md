@@ -23,6 +23,22 @@ ETH3D terrace, 23 DSLR images, 1600 px working size, through the full platform
 
 Peak process-tree RSS 3.8 GiB. Submit-to-202 latency: **46 ms**.
 
+## Dense reconstruction (GPU, opt-in)
+
+COLMAP 4.2.1 CUDA build, same terrace scene (23 images), dense working size 1000 px, geometric
+consistency on. Two measured runs:
+
+| Run | Dense stage | Points | GPU memory in use (peak) | Evidence |
+|-----|------------:|-------:|-------------------------:|----------|
+| Through the platform (job with `dense: true`) | 344 s (PatchMatch 340 s, fusion 3 s) | 249,005 (249,005 in the browser preview, decimation cap is 300k) | 678 MiB | `benchmarks/results/gate5/dense_job.json` |
+| Standalone probe before integration | 773 s | 253,904 | 1,545 MiB | measured by hand, not committed |
+
+The two runs differ by 2.2x in time and in memory with the same inputs and settings. The cause was
+not investigated; a plausible factor is laptop GPU power and thermal state, and the "memory in use"
+figure includes other processes on the GPU (desktop, browser). Treat the dense numbers as a range.
+Peak GPU memory stayed far below the 8 GiB budget; the one-heavy-job-at-a-time rule means dense never
+runs alongside another GPU job.
+
 ## Control-plane API under bounded load
 
 Closed-loop clients on the same machine over loopback, zero think time, 15 s per phase after a 2 s

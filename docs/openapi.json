@@ -344,6 +344,8 @@
                                     "SFM_NO_MODEL",
                                     "LOW_REGISTRATION",
                                     "FRAGMENTED_MODEL",
+                                    "DENSE_UNAVAILABLE",
+                                    "DENSE_FAILED",
                                     "TIMEOUT",
                                     "MEMORY_BUDGET_EXCEEDED",
                                     "DISK_BUDGET_EXCEEDED",
@@ -521,6 +523,8 @@
                                       "SFM_NO_MODEL",
                                       "LOW_REGISTRATION",
                                       "FRAGMENTED_MODEL",
+                                      "DENSE_UNAVAILABLE",
+                                      "DENSE_FAILED",
                                       "TIMEOUT",
                                       "MEMORY_BUDGET_EXCEEDED",
                                       "DISK_BUDGET_EXCEEDED",
@@ -699,6 +703,8 @@
                                     "SFM_NO_MODEL",
                                     "LOW_REGISTRATION",
                                     "FRAGMENTED_MODEL",
+                                    "DENSE_UNAVAILABLE",
+                                    "DENSE_FAILED",
                                     "TIMEOUT",
                                     "MEMORY_BUDGET_EXCEEDED",
                                     "DISK_BUDGET_EXCEEDED",
@@ -1424,6 +1430,8 @@
                                     "SFM_NO_MODEL",
                                     "LOW_REGISTRATION",
                                     "FRAGMENTED_MODEL",
+                                    "DENSE_UNAVAILABLE",
+                                    "DENSE_FAILED",
                                     "TIMEOUT",
                                     "MEMORY_BUDGET_EXCEEDED",
                                     "DISK_BUDGET_EXCEEDED",
@@ -1641,6 +1649,10 @@
                         "type": "integer",
                         "minimum": 0,
                         "maximum": 2147483647
+                      },
+                      "dense": {
+                        "default": false,
+                        "type": "boolean"
                       }
                     }
                   },
@@ -1934,6 +1946,10 @@
                           "type": "integer",
                           "minimum": 0,
                           "maximum": 2147483647
+                        },
+                        "dense": {
+                          "default": false,
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -1942,7 +1958,8 @@
                         "mapper",
                         "matching",
                         "cameraModel",
-                        "seed"
+                        "seed",
+                        "dense"
                       ],
                       "additionalProperties": false
                     },
@@ -2116,6 +2133,8 @@
                               "SFM_NO_MODEL",
                               "LOW_REGISTRATION",
                               "FRAGMENTED_MODEL",
+                              "DENSE_UNAVAILABLE",
+                              "DENSE_FAILED",
                               "TIMEOUT",
                               "MEMORY_BUDGET_EXCEEDED",
                               "DISK_BUDGET_EXCEEDED",
@@ -2171,6 +2190,8 @@
                                 "SFM_NO_MODEL",
                                 "LOW_REGISTRATION",
                                 "FRAGMENTED_MODEL",
+                                "DENSE_UNAVAILABLE",
+                                "DENSE_FAILED",
                                 "TIMEOUT",
                                 "MEMORY_BUDGET_EXCEEDED",
                                 "DISK_BUDGET_EXCEEDED",
@@ -2336,6 +2357,8 @@
                                       "SFM_NO_MODEL",
                                       "LOW_REGISTRATION",
                                       "FRAGMENTED_MODEL",
+                                      "DENSE_UNAVAILABLE",
+                                      "DENSE_FAILED",
                                       "TIMEOUT",
                                       "MEMORY_BUDGET_EXCEEDED",
                                       "DISK_BUDGET_EXCEEDED",
@@ -2590,6 +2613,10 @@
                             "type": "integer",
                             "minimum": 0,
                             "maximum": 2147483647
+                          },
+                          "dense": {
+                            "default": false,
+                            "type": "boolean"
                           }
                         },
                         "required": [
@@ -2598,7 +2625,8 @@
                           "mapper",
                           "matching",
                           "cameraModel",
-                          "seed"
+                          "seed",
+                          "dense"
                         ],
                         "additionalProperties": false
                       },
@@ -2772,6 +2800,8 @@
                                 "SFM_NO_MODEL",
                                 "LOW_REGISTRATION",
                                 "FRAGMENTED_MODEL",
+                                "DENSE_UNAVAILABLE",
+                                "DENSE_FAILED",
                                 "TIMEOUT",
                                 "MEMORY_BUDGET_EXCEEDED",
                                 "DISK_BUDGET_EXCEEDED",
@@ -2827,6 +2857,8 @@
                                   "SFM_NO_MODEL",
                                   "LOW_REGISTRATION",
                                   "FRAGMENTED_MODEL",
+                                  "DENSE_UNAVAILABLE",
+                                  "DENSE_FAILED",
                                   "TIMEOUT",
                                   "MEMORY_BUDGET_EXCEEDED",
                                   "DISK_BUDGET_EXCEEDED",
@@ -2992,6 +3024,8 @@
                                         "SFM_NO_MODEL",
                                         "LOW_REGISTRATION",
                                         "FRAGMENTED_MODEL",
+                                        "DENSE_UNAVAILABLE",
+                                        "DENSE_FAILED",
                                         "TIMEOUT",
                                         "MEMORY_BUDGET_EXCEEDED",
                                         "DISK_BUDGET_EXCEEDED",
@@ -3208,6 +3242,10 @@
                           "type": "integer",
                           "minimum": 0,
                           "maximum": 2147483647
+                        },
+                        "dense": {
+                          "default": false,
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -3216,7 +3254,8 @@
                         "mapper",
                         "matching",
                         "cameraModel",
-                        "seed"
+                        "seed",
+                        "dense"
                       ],
                       "additionalProperties": false
                     },
@@ -3390,6 +3429,8 @@
                               "SFM_NO_MODEL",
                               "LOW_REGISTRATION",
                               "FRAGMENTED_MODEL",
+                              "DENSE_UNAVAILABLE",
+                              "DENSE_FAILED",
                               "TIMEOUT",
                               "MEMORY_BUDGET_EXCEEDED",
                               "DISK_BUDGET_EXCEEDED",
@@ -3445,6 +3486,8 @@
                                 "SFM_NO_MODEL",
                                 "LOW_REGISTRATION",
                                 "FRAGMENTED_MODEL",
+                                "DENSE_UNAVAILABLE",
+                                "DENSE_FAILED",
                                 "TIMEOUT",
                                 "MEMORY_BUDGET_EXCEEDED",
                                 "DISK_BUDGET_EXCEEDED",
@@ -3610,6 +3653,8 @@
                                       "SFM_NO_MODEL",
                                       "LOW_REGISTRATION",
                                       "FRAGMENTED_MODEL",
+                                      "DENSE_UNAVAILABLE",
+                                      "DENSE_FAILED",
                                       "TIMEOUT",
                                       "MEMORY_BUDGET_EXCEEDED",
                                       "DISK_BUDGET_EXCEEDED",
@@ -4023,6 +4068,24 @@
                     "camerasUrl": {
                       "type": "string"
                     },
+                    "densePointsUrl": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "densePointCount": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
                     "expiresAt": {
                       "type": "string",
                       "format": "date-time",
@@ -4037,6 +4100,8 @@
                     "pointCount",
                     "pointsUrl",
                     "camerasUrl",
+                    "densePointsUrl",
+                    "densePointCount",
                     "expiresAt",
                     "note"
                   ],

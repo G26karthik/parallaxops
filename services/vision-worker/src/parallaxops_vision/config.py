@@ -51,6 +51,9 @@ class ReconstructionConfig(BaseModel):
     min_model_size: int = 3
     num_threads: int = Field(default_factory=lambda: max(1, min(8, (os.cpu_count() or 4) // 2)))
     exclude_images: list[str] = Field(default_factory=list)
+    # Optional GPU dense reconstruction (COLMAP CUDA build). Falls back to sparse if unavailable.
+    dense: bool = False
+    dense_max_image_size: int = Field(1000, ge=480, le=2000)
     budgets: Budgets = Field(default_factory=Budgets)
     qc: QCThresholds = Field(default_factory=QCThresholds)
 

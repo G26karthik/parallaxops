@@ -348,6 +348,22 @@ export default function DatasetPage() {
                 </select>
               </Field>
             </div>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={cfg.dense}
+                onChange={(e) => setCfg({ ...cfg, dense: e.target.checked })}
+              />
+              <span>
+                Dense reconstruction (GPU, slow)
+                <span className="block text-xs text-muted">
+                  Needs an NVIDIA GPU and the CUDA build of COLMAP on the worker. Measured on an RTX
+                  4060: 6 to 13 minutes for 23 images at 1000 px. If unavailable you still get the
+                  sparse result, with the reason shown.
+                </span>
+              </span>
+            </label>
             <button
               className="btn btn-primary w-full justify-center"
               disabled={uploaded.length < 5 || start.isPending}

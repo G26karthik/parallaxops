@@ -34,6 +34,7 @@ _CAMEL = {
     "matching": "matching",
     "cameraModel": "camera_model",
     "seed": "seed",
+    "dense": "dense",
 }
 
 
@@ -206,6 +207,8 @@ async def run_reconstruction(inp: dict[str, Any]) -> dict[str, Any]:
             if v
         }
         summary["quality"] = (report.get("metrics") or {}).get("quality")
+        if report.get("dense") and summary.get("metrics") is not None:
+            summary["metrics"] = {**summary["metrics"], "dense": report["dense"]}  # type: ignore[dict-item]
         for stage_name, secs in (report.get("timings_seconds") or {}).items():
             if stage_name != "total":
                 metrics.STAGE_SECONDS.labels(stage=stage_name).observe(secs)

@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -22,22 +22,29 @@ import { Skeleton } from "./ui.tsx";
 
 type ColorMode = "rgb" | "depth" | "flat";
 
+type Source = "sparse" | "dense";
+
 interface SceneData {
   preview: Preview;
   cams: CameraPose[];
   framing: Framing;
+  sparseCount: number;
+  denseCount: number | null;
+  hasDense: boolean;
 }
 
-function useScene(jobId: string) {
+function useScene(jobId: string, source: Source) {
   const { api, tenantId } = useApi();
   return useQuery({
-    queryKey: ["scene", tenantId, jobId],
+    queryKey: ["scene", tenantId, jobId, source],
     enabled: !!api,
     staleTime: 10 * 60_000,
+    placeholderData: keepPreviousData, // keep showing the current view while the other level loads
     queryFn: async (): Promise<SceneData> => {
       const s = await unwrap(api!.GET("/v1/jobs/{jobId}/scene", { params: { path: { jobId } } }));
+      const url = source === "dense" && s.densePointsUrl ? s.densePointsUrl : s.pointsUrl;
       const [pBuf, cJson] = await Promise.all([
-        fetch(s.pointsUrl).then((r) => {
+        fetch(url).then((r) => {
           if (!r.ok) throw new Error(`points download failed (${r.status})`);
           return r.arrayBuffer();
         }),
@@ -48,7 +55,14 @@ function useScene(jobId: string) {
       ]);
       const preview = parsePreview(pBuf);
       const cams = parseCameras(cJson);
-      return { preview, cams, framing: frame(preview, cams) };
+      return {
+        preview,
+        cams,
+        framing: frame(preview, cams),
+        sparseCount: s.pointCount,
+        denseCount: s.densePointCount,
+        hasDense: !!s.densePointsUrl,
+      };
     },
   });
 }
@@ -361,7 +375,8 @@ function Scene({ data, jobId }: { data: SceneData; jobId: string }) {
 }
 
 export function Viewer({ jobId }: { jobId: string }) {
-  const q = useScene(jobId);
+  const [source, setSource] = useState<Source>("sparse");
+  const q = useScene(jobId, source);
   if (q.isLoading) return <Skeleton className="h-[460px]" />;
   if (q.isError)
     return (
@@ -369,5 +384,28 @@ export function Viewer({ jobId }: { jobId: string }) {
         Could not load the 3D scene: {(q.error as Error).message}
       </div>
     );
-  return q.data ? <Scene data={q.data} jobId={jobId} /> : null;
+  if (!q.data) return null;
+  const d = q.data;
+  return (
+    <div className="space-y-2">
+      {d.hasDense ? (
+        <fieldset className="flex items-center gap-4 text-sm" aria-label="Point cloud level">
+          {(["sparse", "dense"] as const).map((s) => (
+            <label key={s} className="flex items-center gap-1.5">
+              <input
+                type="radio"
+                name="source"
+                checked={source === s}
+                onChange={() => setSource(s)}
+              />
+              {s === "sparse"
+                ? `Sparse SfM (${num(d.sparseCount)} points)`
+                : `Dense MVS (${num(d.denseCount)} points, decimated for the browser)`}
+            </label>
+          ))}
+        </fieldset>
+      ) : null}
+      <Scene data={d} jobId={jobId} />
+    </div>
+  );
 }

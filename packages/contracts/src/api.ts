@@ -18,6 +18,8 @@ export const DIAGNOSTIC_CODES = [
   "SFM_NO_MODEL",
   "LOW_REGISTRATION",
   "FRAGMENTED_MODEL",
+  "DENSE_UNAVAILABLE",
+  "DENSE_FAILED",
   "TIMEOUT",
   "MEMORY_BUDGET_EXCEEDED",
   "DISK_BUDGET_EXCEEDED",
@@ -51,6 +53,8 @@ export const ReconstructionConfigSchema = z.object({
     .min(0)
     .max(2 ** 31 - 1)
     .default(0),
+  /** Optional GPU dense reconstruction; the worker falls back to sparse and says why if unavailable. */
+  dense: z.boolean().default(false),
 });
 export type ReconstructionConfig = z.infer<typeof ReconstructionConfigSchema>;
 
@@ -197,6 +201,9 @@ export const SceneSchema = z.object({
   pointCount: z.number().int(),
   pointsUrl: z.string(),
   camerasUrl: z.string(),
+  /** Present only when a dense point cloud was produced. */
+  densePointsUrl: z.string().nullable(),
+  densePointCount: z.number().int().nullable(),
   expiresAt: Iso,
   note: z.string(),
 });

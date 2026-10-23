@@ -19,6 +19,8 @@ class DiagnosticCode(StrEnum):
     SFM_NO_MODEL = "SFM_NO_MODEL"
     LOW_REGISTRATION = "LOW_REGISTRATION"
     FRAGMENTED_MODEL = "FRAGMENTED_MODEL"
+    DENSE_UNAVAILABLE = "DENSE_UNAVAILABLE"
+    DENSE_FAILED = "DENSE_FAILED"
     TIMEOUT = "TIMEOUT"
     MEMORY_BUDGET_EXCEEDED = "MEMORY_BUDGET_EXCEEDED"
     DISK_BUDGET_EXCEEDED = "DISK_BUDGET_EXCEEDED"
@@ -55,6 +57,11 @@ ADVICE: dict[DiagnosticCode, str] = {
     DiagnosticCode.FRAGMENTED_MODEL: (
         "Images split into disconnected groups. Add bridging views that overlap both groups."
     ),
+    DiagnosticCode.DENSE_UNAVAILABLE: (
+        "The sparse result is still valid. Dense reconstruction needs an NVIDIA GPU with free "
+        "memory and the CUDA build of COLMAP on the worker."
+    ),
+    DiagnosticCode.DENSE_FAILED: "The sparse result is still valid; try a smaller dense image size.",
     DiagnosticCode.TIMEOUT: "Reduce image count or resolution, or raise the job time budget.",
     DiagnosticCode.MEMORY_BUDGET_EXCEEDED: "Reduce image resolution or feature count.",
     DiagnosticCode.DISK_BUDGET_EXCEEDED: "Reduce image count or resolution.",

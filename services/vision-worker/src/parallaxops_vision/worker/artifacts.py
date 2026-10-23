@@ -17,10 +17,12 @@ from .storage import Store
 PREVIEW_MAGIC = b"PXPT"
 PREVIEW_VERSION = 1
 PREVIEW_MAX_POINTS = 200_000
+DENSE_PREVIEW_MAX_POINTS = 300_000
 
 # kind -> (relative path inside the pipeline output dir, content type)
 FILES: dict[str, tuple[str, str]] = {
     "points_ply": ("points_sparse.ply", "application/octet-stream"),
+    "points_dense_ply": ("points_dense.ply", "application/octet-stream"),
     "cameras": ("cameras.json", "application/json"),
     "report": ("report.json", "application/json"),
     "qc_report": ("qc_report.json", "application/json"),
@@ -68,6 +70,13 @@ def publish(store: Store, out_dir: Path, prefix: str, scratch: Path) -> list[dic
     preview = scratch / "points_preview.bin"
     build_preview(out_dir / "points_sparse.ply", preview)
     staged["points_preview"] = (preview, "application/octet-stream")
+    if (out_dir / "points_dense.ply").exists():
+        # Dense clouds are large: the browser gets a deterministic decimated level (<= 300k points).
+        dense_preview = scratch / "points_dense_preview.bin"
+        build_preview(
+            out_dir / "points_dense.ply", dense_preview, max_points=DENSE_PREVIEW_MAX_POINTS
+        )
+        staged["points_dense_preview"] = (dense_preview, "application/octet-stream")
     sparse = out_dir / "colmap" / "sparse" / "0"
     if sparse.exists():
         archive = scratch / "colmap_sparse.zip"

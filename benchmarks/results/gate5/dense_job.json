@@ -1,0 +1,56 @@
+{
+  "wall_seconds": 389.7,
+  "timeline": [
+    [
+      0.0,
+      "QUEUED"
+    ],
+    [
+      1.0,
+      "PREPROCESSING"
+    ],
+    [
+      2.0,
+      "RECONSTRUCTING"
+    ],
+    [
+      43.5,
+      "EVALUATING"
+    ],
+    [
+      389.7,
+      "COMPLETED"
+    ]
+  ],
+  "sparse_points": 5280,
+  "dense": {
+    "note": "Dense MVS point cloud (geometrically consistent depth fusion). Not a mesh; scale arbitrary.",
+    "colmap": "COLMAP 4.2.1 (Commit bd1fcf6 on 2026-09-29 with CUDA, boost hash maps)",
+    "n_points": 249005,
+    "peak_vram_mib": 678,
+    "total_seconds": 343.88,
+    "max_image_size": 1000,
+    "stages_seconds": {
+      "dense_fusion": 3.16,
+      "dense_undistort": 0.52,
+      "dense_patch_match": 340.06
+    },
+    "geom_consistency": true
+  },
+  "preview_points": 249005,
+  "stages": {
+    "download_inputs": 0.146,
+    "qc": 0.418,
+    "prepare_images": 0.216,
+    "feature_extraction": 6.183,
+    "feature_matching": 28.899,
+    "sparse_mapping": 5.322,
+    "metrics": 0.391,
+    "export": 0.046,
+    "dense_reconstruction": 343.934,
+    "dense_undistort": 0.52,
+    "dense_patch_match": 340.06,
+    "dense_fusion": 3.16,
+    "publish_artifacts": 0.418
+  }
+}

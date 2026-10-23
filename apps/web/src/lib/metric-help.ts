@@ -52,6 +52,23 @@ export const HELP = {
     meaning:
       "Resident memory of the reconstruction engine and its children; may slightly under-report spikes.",
   },
+  denseCount: {
+    label: "Dense 3D points",
+    source: "COLMAP PatchMatch stereo + geometric fusion (GPU)",
+    meaning:
+      "Points from per-pixel depth estimation fused across views. Much denser than the sparse cloud, still a point cloud (no surface) with arbitrary scale. Density is not accuracy.",
+  },
+  denseTime: {
+    label: "Dense time",
+    source: "Worker, undistort + PatchMatch + fusion",
+    meaning: "GPU stage wall clock, measured on this machine.",
+  },
+  vram: {
+    label: "Peak GPU memory",
+    source: "nvidia-smi sampled every second",
+    meaning:
+      "Device memory in use while the dense stage ran (includes other processes on the GPU).",
+  },
 } as const;
 
 export const SCENE_NOTE =

@@ -199,21 +199,29 @@ export function jobRoutes(app: FastifyInstance, ctx: Ctx) {
           "JOB_NOT_COMPLETED",
           "The 3D scene exists only for completed jobs.",
         );
-      const got = await links(req.tenantId, req.params.jobId, ["points_preview", "cameras"]);
+      const got = await links(req.tenantId, req.params.jobId, [
+        "points_preview",
+        "points_dense_preview",
+        "cameras",
+      ]);
       const pts = got.find((a) => a.kind === "points_preview");
       const cams = got.find((a) => a.kind === "cameras");
+      const dense = got.find((a) => a.kind === "points_dense_preview");
       if (!pts || !cams)
         throw new AppError(404, "NOT_FOUND", "Scene artifacts are missing or expired.");
-      const metrics = (job.metrics ?? {}) as { n_points3d?: number };
+      const metrics = (job.metrics ?? {}) as { n_points3d?: number; dense?: { n_points?: number } };
       return {
         jobId: job.id,
         pointCount: metrics.n_points3d ?? 0,
         pointsUrl: pts.url,
         camerasUrl: cams.url,
+        densePointsUrl: dense?.url ?? null,
+        densePointCount: dense ? (metrics.dense?.n_points ?? null) : null,
         expiresAt: pts.expiresAt,
         note:
-          "Sparse SfM points (triangulated features), not a dense surface. Scale is arbitrary " +
-          "unless an external source supplies it.",
+          "Sparse SfM points (triangulated features); a dense point cloud is offered separately when " +
+          "one was produced. Neither is a surface. Scale is arbitrary unless an external source " +
+          "supplies it.",
       };
     },
   );

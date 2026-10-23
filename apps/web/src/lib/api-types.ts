@@ -179,7 +179,7 @@ export interface paths {
                                 } | null;
                                 error: {
                                     /** @enum {string} */
-                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                     message: string;
                                     advice: string;
                                     stage?: string | null;
@@ -236,7 +236,7 @@ export interface paths {
                                 } | null;
                                 error: {
                                     /** @enum {string} */
-                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                     message: string;
                                     advice: string;
                                     stage?: string | null;
@@ -299,7 +299,7 @@ export interface paths {
                                 } | null;
                                 error: {
                                     /** @enum {string} */
-                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                     message: string;
                                     advice: string;
                                     stage?: string | null;
@@ -637,7 +637,7 @@ export interface paths {
                                 } | null;
                                 error: {
                                     /** @enum {string} */
-                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                     message: string;
                                     advice: string;
                                     stage?: string | null;
@@ -737,6 +737,8 @@ export interface paths {
                             cameraModel?: "SIMPLE_RADIAL" | "RADIAL" | "OPENCV" | "SIMPLE_PINHOLE";
                             /** @default 0 */
                             seed?: number;
+                            /** @default false */
+                            dense?: boolean;
                         };
                         label?: string;
                     };
@@ -868,6 +870,8 @@ export interface paths {
                                 cameraModel: "SIMPLE_RADIAL" | "RADIAL" | "OPENCV" | "SIMPLE_PINHOLE";
                                 /** @default 0 */
                                 seed: number;
+                                /** @default false */
+                                dense: boolean;
                             };
                             label: string | null;
                             /** Format: date-time */
@@ -897,7 +901,7 @@ export interface paths {
                             } | null;
                             warnings: {
                                 /** @enum {string} */
-                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                 message: string;
                                 advice: string;
                                 stage?: string | null;
@@ -907,7 +911,7 @@ export interface paths {
                             }[];
                             diagnostic: {
                                 /** @enum {string} */
-                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                 message: string;
                                 advice: string;
                                 stage?: string | null;
@@ -932,7 +936,7 @@ export interface paths {
                                 finishedAt: string | null;
                                 failure: {
                                     /** @enum {string} */
-                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                     message: string;
                                     advice: string;
                                     stage?: string | null;
@@ -1031,6 +1035,8 @@ export interface paths {
                                 cameraModel: "SIMPLE_RADIAL" | "RADIAL" | "OPENCV" | "SIMPLE_PINHOLE";
                                 /** @default 0 */
                                 seed: number;
+                                /** @default false */
+                                dense: boolean;
                             };
                             label: string | null;
                             /** Format: date-time */
@@ -1060,7 +1066,7 @@ export interface paths {
                             } | null;
                             warnings: {
                                 /** @enum {string} */
-                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                 message: string;
                                 advice: string;
                                 stage?: string | null;
@@ -1070,7 +1076,7 @@ export interface paths {
                             }[];
                             diagnostic: {
                                 /** @enum {string} */
-                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                 message: string;
                                 advice: string;
                                 stage?: string | null;
@@ -1095,7 +1101,7 @@ export interface paths {
                                 finishedAt: string | null;
                                 failure: {
                                     /** @enum {string} */
-                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                     message: string;
                                     advice: string;
                                     stage?: string | null;
@@ -1180,6 +1186,8 @@ export interface paths {
                                 cameraModel: "SIMPLE_RADIAL" | "RADIAL" | "OPENCV" | "SIMPLE_PINHOLE";
                                 /** @default 0 */
                                 seed: number;
+                                /** @default false */
+                                dense: boolean;
                             };
                             label: string | null;
                             /** Format: date-time */
@@ -1209,7 +1217,7 @@ export interface paths {
                             } | null;
                             warnings: {
                                 /** @enum {string} */
-                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                 message: string;
                                 advice: string;
                                 stage?: string | null;
@@ -1219,7 +1227,7 @@ export interface paths {
                             }[];
                             diagnostic: {
                                 /** @enum {string} */
-                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                 message: string;
                                 advice: string;
                                 stage?: string | null;
@@ -1244,7 +1252,7 @@ export interface paths {
                                 finishedAt: string | null;
                                 failure: {
                                     /** @enum {string} */
-                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
+                                    code: "TOO_FEW_IMAGES" | "TOO_MANY_IMAGES" | "UNREADABLE_IMAGES" | "INPUT_TOO_LARGE" | "DUPLICATE_IMAGES" | "NO_FEATURES" | "INSUFFICIENT_MATCHES" | "NO_INITIAL_PAIR" | "SFM_NO_MODEL" | "LOW_REGISTRATION" | "FRAGMENTED_MODEL" | "DENSE_UNAVAILABLE" | "DENSE_FAILED" | "TIMEOUT" | "MEMORY_BUDGET_EXCEEDED" | "DISK_BUDGET_EXCEEDED" | "CANCELLED" | "ENGINE_CRASH" | "INTERNAL";
                                     message: string;
                                     advice: string;
                                     stage?: string | null;
@@ -1439,6 +1447,8 @@ export interface paths {
                             pointCount: number;
                             pointsUrl: string;
                             camerasUrl: string;
+                            densePointsUrl: string | null;
+                            densePointCount: number | null;
                             /** Format: date-time */
                             expiresAt: string;
                             note: string;

@@ -16,6 +16,11 @@ const STAGES: [string, string][] = [
   ["export", "Export PLY, poses"],
   ["publish_artifacts", "Publish artifacts"],
 ];
+// Only shown for runs that asked for it; otherwise it would sit "pending" forever.
+const DENSE_STAGES: [string, string][] = [
+  ["dense_patch_match", "Dense depth estimation (GPU PatchMatch)"],
+  ["dense_fusion", "Dense fusion"],
+];
 
 export function Timeline({ job }: { job: Job }) {
   const byName = new Map(job.stages.map((s) => [s.name, s]));
@@ -32,7 +37,10 @@ export function Timeline({ job }: { job: Job }) {
         </p>
       </div>
       <ol className="mt-3 space-y-1.5">
-        {STAGES.map(([key, label]) => {
+        {(job.config.dense
+          ? [...STAGES.slice(0, 8), ...DENSE_STAGES, ...STAGES.slice(8)]
+          : STAGES
+        ).map(([key, label]) => {
           const s = byName.get(key);
           const state = s?.state ?? "PENDING";
           const color =
@@ -112,6 +120,9 @@ export function Metrics({ job }: { job: Job }) {
   const m = job.metrics as M | null;
   if (!m) return null;
   const res = (job.resources ?? {}) as { peak_rss_bytes_process_tree?: number };
+  const dense = (
+    job.metrics as { dense?: { n_points: number; total_seconds: number; peak_vram_mib: number } }
+  ).dense;
   const q = job.quality;
   const tone =
     q?.level === "good" ? "var(--good)" : q?.level === "poor" ? "var(--bad)" : "var(--warn)";
@@ -155,6 +166,13 @@ export function Metrics({ job }: { job: Job }) {
         <Card help={HELP.triAngle} value={m.triangulation_angle_deg_median.toFixed(1)} unit="deg" />
         <Card help={HELP.wall} value={seconds(job.durationSeconds)} />
         <Card help={HELP.queue} value={seconds(job.queueWaitSeconds)} />
+        {dense ? (
+          <>
+            <Card help={HELP.denseCount} value={num(dense.n_points)} unit="points" />
+            <Card help={HELP.denseTime} value={seconds(dense.total_seconds)} />
+            <Card help={HELP.vram} value={`${num(dense.peak_vram_mib)} MiB`} />
+          </>
+        ) : null}
         {res.peak_rss_bytes_process_tree ? (
           <Card help={HELP.rss} value={bytes(res.peak_rss_bytes_process_tree)} />
         ) : null}

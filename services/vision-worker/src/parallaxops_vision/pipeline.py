@@ -20,6 +20,7 @@ import pycolmap
 
 from . import CONTRACT_VERSION, __version__
 from .config import ReconstructionConfig
+from .dense import run_dense
 from .diagnostics import Diagnostic, DiagnosticCode, ReconstructionError
 from .envinfo import host_info, tool_versions
 from .export import (
@@ -288,7 +289,35 @@ def reconstruct(
         if gt_images_txt is not None:
             report["ground_truth_eval"] = _eval_gt(rec, prepared, gt_images_txt)
         report["points_exported"] = n_pts
-        report["status"] = "completed"
+        report["status"] = "completed"  # the sparse result is complete; dense is a bonus layer
+
+        if cfg.dense:
+            sub("dense_reconstruction", "start")
+            t = time.perf_counter()
+            try:
+                report["dense"] = run_dense(
+                    work / eng["best_model_dir"],
+                    work / "images",
+                    work / "dense_work",
+                    staging / "points_dense.ply",
+                    max_image_size=cfg.dense_max_image_size,
+                    timeout_s=max(
+                        120.0, cfg.budgets.wall_clock_seconds - (time.perf_counter() - t_start)
+                    ),
+                    cancel=cancel,
+                    on_stage=lambda name, phase, secs: sub(name, phase, secs),
+                )
+                report["limitations"] = [
+                    "Dense point cloud from multi-view stereo; no mesh or surface was reconstructed.",
+                    *LIMITATIONS[1:],
+                ]
+            except ReconstructionError as exc:
+                if exc.diagnostic.code is DiagnosticCode.CANCELLED:
+                    raise  # a cancel must stop the whole job, not silently fall back
+                # Documented fallback: keep the valid sparse result and say why dense is missing.
+                report["warnings"].append(exc.diagnostic.model_dump(mode="json"))
+            timings["dense"] = round(time.perf_counter() - t, 3)
+            sub("dense_reconstruction", "end", timings["dense"])
         stage("EVALUATING", "end")
     except ReconstructionError as exc:
         report["diagnostic"] = exc.diagnostic.model_dump(mode="json")
