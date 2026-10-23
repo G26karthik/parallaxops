@@ -1,0 +1,253 @@
+{
+  "contract_version": "1.0",
+  "worker_version": "0.1.0",
+  "attempt_id": "372cf5449dd9",
+  "status": "completed",
+  "config": {
+    "schema_version": 1,
+    "seed": 0,
+    "max_image_size": 1600,
+    "max_num_features": 8192,
+    "camera_model": "SIMPLE_RADIAL",
+    "single_camera": true,
+    "matching": "auto",
+    "sequential_overlap": 10,
+    "mapper": "incremental",
+    "min_num_matches": 15,
+    "min_model_size": 3,
+    "num_threads": 8,
+    "exclude_images": [],
+    "budgets": {
+      "min_images": 5,
+      "max_images": 80,
+      "max_total_bytes": 1500000000,
+      "max_pixels_per_image": 60000000,
+      "max_total_megapixels": 2500,
+      "wall_clock_seconds": 3600,
+      "max_rss_bytes": 15032385536,
+      "max_workspace_bytes": 8589934592
+    },
+    "qc": {
+      "blur_laplacian_var_min": 40.0,
+      "dark_mean_luma_max": 35.0,
+      "overexposed_fraction_max": 0.12,
+      "dedup_hamming_max": 3,
+      "min_registered_fraction_ok": 0.6
+    }
+  },
+  "limitations": [
+    "Sparse reconstruction only: points are triangulated SIFT features, not a dense surface.",
+    "Scale is arbitrary (monocular input). No metric distances are claimed.",
+    "Image QC flags are heuristics and do not prove overlap or reconstructability.",
+    "Reprojection error is a self-consistency proxy, not ground-truth accuracy."
+  ],
+  "warnings": [],
+  "qc_summary": {
+    "n_images": 23,
+    "n_used": 23,
+    "warnings": [],
+    "flag_counts": {
+      "possibly_blurry": 0,
+      "dark": 0,
+      "overexposed": 2,
+      "near_duplicate": 0,
+      "exact_duplicate": 0
+    }
+  },
+  "resources": {
+    "engine_wall_seconds": 57.804,
+    "engine_cpu_seconds": 399.56,
+    "peak_rss_bytes_process_tree": 4116332544,
+    "note": "RSS is sampled every 0.5 s; peak may be slightly under-reported. No GPU used."
+  },
+  "matching_graph": {
+    "images_with_keypoints": 23,
+    "median_keypoints": 5903,
+    "verified_pairs": 124,
+    "inlier_counts_median": 190,
+    "connected_components": [
+      23
+    ]
+  },
+  "models_found": [
+    {
+      "model_id": 0,
+      "registered_images": 23,
+      "points3d": 5434
+    }
+  ],
+  "metrics": {
+    "n_input_images": 23,
+    "n_registered": 23,
+    "registered_fraction": 1.0,
+    "unregistered": [],
+    "n_points3d": 5434,
+    "n_observations": 21296,
+    "mean_observations_per_image": 925.91,
+    "track_length_mean": 3.919,
+    "track_length_median": 3.0,
+    "track_length_hist": {
+      "2": 462,
+      "3": 2437,
+      "4": 1163,
+      "5-9": 1319,
+      "10+": 53
+    },
+    "reproj_error_px_mean": 0.8449,
+    "reproj_error_px_median": 0.7663,
+    "reproj_error_px_p90": 1.4882,
+    "reproj_error_px_max": 3.227,
+    "triangulation_angle_deg_median": 11.026,
+    "triangulation_angle_deg_p10": 3.38,
+    "extent_model_units": [
+      26.0559,
+      28.2401,
+      71.28
+    ],
+    "cameras": [
+      {
+        "camera_id": 1,
+        "model": "SIMPLE_RADIAL",
+        "width": 1600,
+        "height": 1067,
+        "params": [
+          896.9740614711807,
+          800.0,
+          533.5,
+          -0.041365331770557574
+        ],
+        "focal_px_working": 896.974,
+        "focal_px_original_resolution": 3390.565,
+        "prior_focal_from_exif": false
+      }
+    ],
+    "quality": {
+      "level": "good",
+      "reasons": [
+        "all rubric thresholds met"
+      ],
+      "rubric": "Heuristic rubric, not accuracy: good = >=90% images registered, mean reprojection <=1.0 px, mean track length >=3.5, median triangulation angle >=3 deg. poor = <60% registered, mean reprojection >2.0 px, or median triangulation angle <1.5 deg. Otherwise fair. Low reprojection error does not prove geometric accuracy."
+    },
+    "units_note": "Model units are arbitrary (monocular). Reprojection error is in pixels at working resolution. Point count is not an accuracy measure."
+  },
+  "ground_truth_eval": {
+    "n_registered": 23,
+    "n_matched_to_gt": 23,
+    "n_inliers": 23,
+    "scale_gt_units_per_model_unit": 0.678453,
+    "ate_rmse_all": 0.02404,
+    "ate_rmse_inliers": 0.02404,
+    "ate_median": 0.02219,
+    "ate_max": 0.04498,
+    "gt_camera_spread": 7.6453,
+    "ate_rmse_all_over_spread": 0.00314,
+    "rotation_error_deg_median": 0.521,
+    "rotation_error_deg_max": 0.679,
+    "per_image": {
+      "DSC_0259.JPG": {
+        "position_error": 0.01064,
+        "rotation_error_deg": 0.539
+      },
+      "DSC_0260.JPG": {
+        "position_error": 0.01423,
+        "rotation_error_deg": 0.612
+      },
+      "DSC_0261.JPG": {
+        "position_error": 0.01392,
+        "rotation_error_deg": 0.677
+      },
+      "DSC_0262.JPG": {
+        "position_error": 0.01401,
+        "rotation_error_deg": 0.679
+      },
+      "DSC_0263.JPG": {
+        "position_error": 0.03117,
+        "rotation_error_deg": 0.41
+      },
+      "DSC_0264.JPG": {
+        "position_error": 0.03402,
+        "rotation_error_deg": 0.469
+      },
+      "DSC_0266.JPG": {
+        "position_error": 0.0279,
+        "rotation_error_deg": 0.549
+      },
+      "DSC_0267.JPG": {
+        "position_error": 0.01609,
+        "rotation_error_deg": 0.61
+      },
+      "DSC_0268.JPG": {
+        "position_error": 0.01647,
+        "rotation_error_deg": 0.593
+      },
+      "DSC_0269.JPG": {
+        "position_error": 0.0153,
+        "rotation_error_deg": 0.644
+      },
+      "DSC_0270.JPG": {
+        "position_error": 0.02235,
+        "rotation_error_deg": 0.633
+      },
+      "DSC_0271.JPG": {
+        "position_error": 0.02631,
+        "rotation_error_deg": 0.636
+      },
+      "DSC_0272.JPG": {
+        "position_error": 0.02219,
+        "rotation_error_deg": 0.655
+      },
+      "DSC_0273.JPG": {
+        "position_error": 0.02084,
+        "rotation_error_deg": 0.379
+      },
+      "DSC_0274.JPG": {
+        "position_error": 0.03349,
+        "rotation_error_deg": 0.272
+      },
+      "DSC_0275.JPG": {
+        "position_error": 0.02724,
+        "rotation_error_deg": 0.3
+      },
+      "DSC_0276.JPG": {
+        "position_error": 0.02304,
+        "rotation_error_deg": 0.329
+      },
+      "DSC_0277.JPG": {
+        "position_error": 0.02562,
+        "rotation_error_deg": 0.357
+      },
+      "DSC_0278.JPG": {
+        "position_error": 0.01597,
+        "rotation_error_deg": 0.457
+      },
+      "DSC_0279.JPG": {
+        "position_error": 0.00871,
+        "rotation_error_deg": 0.506
+      },
+      "DSC_0283.JPG": {
+        "position_error": 0.01702,
+        "rotation_error_deg": 0.484
+      },
+      "DSC_0284.JPG": {
+        "position_error": 0.03325,
+        "rotation_error_deg": 0.521
+      },
+      "DSC_0285.JPG": {
+        "position_error": 0.04498,
+        "rotation_error_deg": 0.504
+      }
+    },
+    "note": "Errors are in the GT unit after a RANSAC+Umeyama similarity fit. 'all' includes images the fit rejected; 'inliers' is optimistic by construction. The scale comes from GT."
+  },
+  "points_exported": 5434,
+  "timings_seconds": {
+    "qc": 4.205,
+    "prepare_images": 10.227,
+    "feature_extraction": 9.54,
+    "feature_matching": 39.688,
+    "sparse_mapping": 7.684,
+    "metrics": 0.195,
+    "export": 0.061,
+    "total": 72.563
+  }
+}
