@@ -6,8 +6,8 @@ on:
   pull_request:
 
 jobs:
-  vision:
-    name: vision worker (CPU, no GPU, no downloads)
+  check:
+    name: "checks (same script as the local pre-push hook)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,13 +15,6 @@ jobs:
       - name: Install
         run: |
           uv venv --python 3.14 .venv
-          uv pip install --python .venv/bin/python -e "services/vision-worker[dev]"
-      - name: Lint
-        run: |
-          cd services/vision-worker
-          ../../.venv/bin/python -m ruff check .
-          ../../.venv/bin/python -m ruff format --check .
-      - name: Types
-        run: cd services/vision-worker && ../../.venv/bin/python -m mypy
-      - name: "Unit tests (integration tests are deselected; they need the ETH3D download)"
-        run: cd services/vision-worker && ../../.venv/bin/python -m pytest -m "not integration and not gpu"
+          uv pip install --python .venv/bin/python -e "services/vision-worker[dev]" check-jsonschema types-psutil
+      - name: Run scripts/check.py
+        run: .venv/bin/python scripts/check.py

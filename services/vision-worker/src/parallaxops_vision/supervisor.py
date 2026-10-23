@@ -21,9 +21,7 @@ from typing import Any
 
 import psutil
 
-_IS_WINDOWS = sys.platform == "win32"
-
-if _IS_WINDOWS:
+if sys.platform == "win32":  # literal check so mypy/pyright analyse each OS correctly
     import ctypes
     from ctypes import wintypes
 
@@ -160,7 +158,13 @@ def run_supervised(
     tick_s: float = 0.5,
 ) -> SupervisedResult:
     child_env = {**os.environ, "PYTHONUTF8": "1", **(env or {})}
-    job = _Job(None) if _IS_WINDOWS else None
+    job: Any | None = None
+    spawn_flags: dict[str, Any]
+    if sys.platform == "win32":
+        job = _Job(None)
+        spawn_flags = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP}
+    else:
+        spawn_flags = {"start_new_session": True}
     t0 = time.perf_counter()
     peak_rss = 0
     cpu_seen: dict[int, float] = {}
@@ -169,15 +173,14 @@ def run_supervised(
     last_disk = 0.0
     disk_bytes = 0
     with log_path.open("wb") as log:
-        popen = subprocess.Popen(
+        popen: subprocess.Popen[bytes] = subprocess.Popen(
             list(argv),
             cwd=cwd,
             env=child_env,
             stdout=log,
             stderr=subprocess.STDOUT,
             stdin=subprocess.DEVNULL,
-            start_new_session=not _IS_WINDOWS,
-            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if _IS_WINDOWS else 0,
+            **spawn_flags,
         )
         try:
             if job is not None:
