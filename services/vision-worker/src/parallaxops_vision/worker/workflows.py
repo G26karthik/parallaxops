@@ -77,7 +77,8 @@ class ReconstructionWorkflow:
                 # Queue wait is bounded separately from execution time.
                 schedule_to_start_timeout=timedelta(hours=6),
                 start_to_close_timeout=timedelta(minutes=90),
-                heartbeat_timeout=timedelta(seconds=90),
+                # The activity heartbeats every second; a dead worker is detected within this window.
+                heartbeat_timeout=timedelta(seconds=45),
                 retry_policy=RetryPolicy(
                     initial_interval=timedelta(seconds=5),
                     backoff_coefficient=2.0,
