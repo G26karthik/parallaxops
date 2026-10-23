@@ -61,6 +61,14 @@ def ts_steps(fast: bool) -> list[tuple[str, list[str], Path]]:
     ]
     if not fast:
         out.append(("vitest (unit)", ["pnpm", "-r", "test"], ROOT))
+        # A production build catches what tsc cannot: bundler, routing and config errors.
+        out.append(
+            (
+                "next build (web)",
+                ["pnpm", "--filter", "@parallaxops/web", "build"],
+                ROOT,
+            )
+        )
     return out
 
 

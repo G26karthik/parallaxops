@@ -79,7 +79,9 @@ def main() -> int:
             dest = tools / name
             dest.mkdir(parents=True, exist_ok=True)
             with zipfile.ZipFile(io.BytesIO(fetch(url))) as z:
-                z.extractall(dest)  # zipfile rejects absolute paths and .. traversal on extract
+                z.extractall(
+                    dest
+                )  # zipfile rejects absolute paths and .. traversal on extract
     if need("postgres", tools / "postgres" / "bin" / "postgres.exe"):
         with zipfile.ZipFile(io.BytesIO(fetch(PG_JAR))) as z:
             txz = next(n for n in z.namelist() if n.endswith(".txz"))
