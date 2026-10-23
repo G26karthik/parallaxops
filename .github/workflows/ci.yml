@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
+      - name: System libraries required by Open3D wheels on Linux
+        run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0 libgomp1 libgl1
       - name: Install
         run: |
           uv venv --python 3.14 .venv

@@ -84,6 +84,10 @@ $d = "$env:PARALLAXOPS_HOME\data\eth3d\terrace\terrace"
   --ground-truth "$d\dslr_calibration_jpg\images.txt"
 ```
 
+On Linux the Open3D wheel needs system libraries: `sudo apt-get install libusb-1.0-0 libgomp1 libgl1`.
+Run the same checks as CI before pushing with `python scripts/check.py`
+(`git config core.hooksPath .githooks` enables it as a pre-push hook).
+
 Exit codes are typed: `0` success; `10+` map to `DiagnosticCode` (see
 `services/vision-worker/src/parallaxops_vision/diagnostics.py`), e.g. too few images, no features,
 low registration, timeout, cancelled.
