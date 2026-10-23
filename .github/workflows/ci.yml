@@ -23,5 +23,5 @@ jobs:
           ../../.venv/bin/python -m ruff format --check .
       - name: Types
         run: cd services/vision-worker && ../../.venv/bin/python -m mypy
-      - name: Unit tests (integration tests skip: dataset not downloaded)
+      - name: "Unit tests (integration tests are deselected; they need the ETH3D download)"
         run: cd services/vision-worker && ../../.venv/bin/python -m pytest -m "not integration and not gpu"
