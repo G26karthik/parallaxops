@@ -160,10 +160,10 @@ curl -s localhost:4000/readyz                    # database, object store, workf
 
 | Suite | Count | What it needs |
 |-------|------:|---------------|
-| Python unit (QC, supervisor, controller, scratch sweeper, worker, dense wrapper, ground truth) | 57 | nothing |
+| Python unit (QC, supervisor, controller, scratch sweeper, worker, engine failure mapping, contract sync, dense wrapper, ground truth) | 69 | nothing |
 | Python integration (real COLMAP on ETH3D) | 2 | the downloaded scene |
-| TypeScript (state machine, contracts, API on in-process Postgres, web libs) | 64 | nothing |
-| End-to-end against the live stack (API, browser incl. axe accessibility, failure injection, dense GPU) | 13 | `dev.ps1 up`, dataset, GPU for one |
+| TypeScript (state machine, contracts, API on in-process Postgres incl. concurrency races, web libs) | 68 | nothing |
+| End-to-end against the live stack (API, browser incl. axe accessibility, failure injection, races, presigned URLs, dense GPU) | 19 | `dev.ps1 up`, dataset, GPU for one |
 
 CI runs `python scripts/check.py`: workflow validation (actionlint), ruff, mypy for three operating
 systems, pytest, Biome, `tsc`, vitest and a production web build. The same script is the local
