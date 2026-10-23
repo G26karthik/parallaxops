@@ -34,7 +34,11 @@ def tool_env() -> dict[str, str]:
     env["PARALLAXOPS_HOME"] = str(home)
     extra = [
         str(p)
-        for p in (home / "tools" / "pnpm", *(home / "tools" / "node").glob("node-*"))
+        for p in (
+            home / "tools" / "pnpm",
+            home / "tools" / "actionlint",
+            *(home / "tools" / "node").glob("node-*"),
+        )
         if p.exists()
     ]
     env["PATH"] = os.pathsep.join([*extra, env.get("PATH", "")])
@@ -75,6 +79,9 @@ def steps(fast: bool) -> list[tuple[str, list[str], Path]]:
             ],
             ROOT,
         ),
+        # actionlint also validates expression contexts (e.g. `runner` is not allowed in job env),
+        # which the JSON schema cannot see. It is required: an unvalidated workflow is never pushed.
+        ("actionlint", ["actionlint", "-no-color", *workflows], ROOT),
         ("ruff lint", [PY, "-m", "ruff", "check", "."], VISION),
         ("ruff format", [PY, "-m", "ruff", "format", "--check", "."], VISION),
     ]
@@ -98,7 +105,17 @@ def main() -> int:
     env = tool_env()
     for name, cmd, cwd in steps(fast):
         t = time.perf_counter()
-        exe = shutil.which(cmd[0], path=env["PATH"]) if cmd[0] == "pnpm" else cmd[0]
+        exe = (
+            shutil.which(cmd[0], path=env["PATH"])
+            if cmd[0] in ("pnpm", "actionlint")
+            else cmd[0]
+        )
+        if exe is None and cmd[0] == "actionlint":
+            print(
+                "FAIL actionlint: not installed. See docs/CI.md for the one-line install."
+            )
+            failed.append(name)
+            continue
         res = subprocess.run(
             [exe or cmd[0], *cmd[1:]], cwd=cwd, env=env, capture_output=True, text=True
         )  # noqa: S603

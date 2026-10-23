@@ -9,17 +9,22 @@ jobs:
   check:
     name: "checks (same script as the local pre-push hook)"
     runs-on: ubuntu-latest
-    env:
-      # .npmrc keeps the pnpm virtual store under this directory, outside the checkout.
-      PARALLAXOPS_HOME: ${{ runner.temp }}/parallaxops
     steps:
       - uses: actions/checkout@v4
+      - name: Keep the pnpm virtual store outside the checkout (see .npmrc)
+        run: echo "PARALLAXOPS_HOME=$RUNNER_TEMP/parallaxops" >> "$GITHUB_ENV"
       - uses: astral-sh/setup-uv@v6
       - uses: actions/setup-node@v4
         with:
           node-version: "26"
       - name: System libraries required by Open3D wheels on Linux
         run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0 libgomp1 libgl1 libegl1
+      - name: Install actionlint (validates this workflow, including expression contexts)
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          curl -sSL https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
+            | tar -xz -C "$RUNNER_TEMP/bin" actionlint
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
       - name: Install Python and Node dependencies
         run: |
           uv venv --python 3.14 .venv
