@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { schema } from "../src/db/client.ts";
 import { runCleanup } from "../src/services/cleanup.ts";
 import { reconcileUnstarted } from "../src/services/jobs.ts";
 import {
@@ -292,6 +294,14 @@ describe("cancellation", () => {
     expect(r.body.state).toBe("PREPROCESSING"); // worker must confirm the teardown
     const hb = await ev(job.id, "heartbeat");
     expect(hb.cancelRequested).toBe(true);
+    // Heartbeats only stamp the job row: storing one per 5 s would grow job_events without bound.
+    const stored = await h.ctx.db
+      .select()
+      .from(schema.jobEvents)
+      .where(eq(schema.jobEvents.jobId, job.id));
+    expect(stored.map((e) => e.type)).not.toContain("heartbeat");
+    const [row] = await h.ctx.db.select().from(schema.jobs).where(eq(schema.jobs.id, job.id));
+    expect(row?.lastHeartbeatAt).not.toBeNull();
     // The workflow reports with a synthetic attempt number; the running attempt must still close.
     const done = await ev(job.id, "cancelled", { state: "CANCELLED", attemptNo: 99 });
     expect(done.jobState).toBe("CANCELLED");

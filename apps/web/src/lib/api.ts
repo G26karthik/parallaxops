@@ -1,4 +1,3 @@
-import type { Job } from "@parallaxops/contracts";
 import createClient from "openapi-fetch";
 import type { paths } from "./api-types.ts";
 
@@ -38,5 +37,3 @@ export async function unwrap<T>(
   }
   return data;
 }
-
-export type JobView = Job;

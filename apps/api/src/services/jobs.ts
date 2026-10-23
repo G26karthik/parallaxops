@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
   type ArtifactReport,
   canTransition,
@@ -48,21 +48,41 @@ export async function audit(
 // ---------------------------------------------------------------------------------------------
 
 export async function serializeJob(ctx: Ctx, row: JobRow): Promise<Job> {
-  const attempts = await ctx.db
-    .select()
-    .from(jobAttempts)
-    .where(eq(jobAttempts.jobId, row.id))
-    .orderBy(asc(jobAttempts.attemptNo));
-  const latest = attempts.at(-1)?.attemptNo;
-  const stages =
-    latest === undefined
-      ? []
-      : await ctx.db
-          .select()
-          .from(jobStages)
-          .where(and(eq(jobStages.jobId, row.id), eq(jobStages.attemptNo, latest)))
-          .orderBy(asc(jobStages.startedAt));
-  const arts = await ctx.db.select().from(artifacts).where(eq(artifacts.jobId, row.id));
+  return (await serializeJobs(ctx, [row]))[0] as Job;
+}
+
+/** Three queries for any number of jobs (a list page used to cost three per job). */
+export async function serializeJobs(ctx: Ctx, rows: JobRow[]): Promise<Job[]> {
+  if (rows.length === 0) return [];
+  const ids = rows.map((r) => r.id);
+  const [allAttempts, allStages, allArts] = await Promise.all([
+    ctx.db
+      .select()
+      .from(jobAttempts)
+      .where(inArray(jobAttempts.jobId, ids))
+      .orderBy(asc(jobAttempts.attemptNo)),
+    ctx.db
+      .select()
+      .from(jobStages)
+      .where(inArray(jobStages.jobId, ids))
+      .orderBy(asc(jobStages.startedAt)),
+    ctx.db.select().from(artifacts).where(inArray(artifacts.jobId, ids)),
+  ]);
+  return rows.map((row) => {
+    const attempts = allAttempts.filter((a) => a.jobId === row.id);
+    const latest = attempts.at(-1)?.attemptNo; // the timeline shows the newest attempt only
+    const stages = allStages.filter((s) => s.jobId === row.id && s.attemptNo === latest);
+    const arts = allArts.filter((a) => a.jobId === row.id);
+    return jobView(row, attempts, stages, arts);
+  });
+}
+
+function jobView(
+  row: JobRow,
+  attempts: (typeof jobAttempts.$inferSelect)[],
+  stages: (typeof jobStages.$inferSelect)[],
+  arts: (typeof artifacts.$inferSelect)[],
+): Job {
   return {
     id: row.id,
     projectId: row.projectId,
@@ -130,13 +150,6 @@ export interface CreateJobInput {
   requestId?: string;
 }
 
-function isUniqueViolation(e: unknown): boolean {
-  const code =
-    (e as { code?: string; cause?: { code?: string } }).code ??
-    (e as { cause?: { code?: string } }).cause?.code;
-  return code === "23505";
-}
-
 export async function createJob(
   ctx: Ctx,
   input: CreateJobInput,
@@ -174,59 +187,18 @@ export async function createJob(
       { advice: "Capture at least 15 overlapping photographs." },
     );
 
-  const [tenant] = await ctx.db.select().from(tenants).where(eq(tenants.id, tenantId));
-  const [{ pending = 0 } = {}] = await ctx.db
-    .select({ pending: count() })
-    .from(jobs)
-    .where(and(eq(jobs.tenantId, tenantId), inArray(jobs.state, [...PENDING_START, ...ACTIVE])));
-  const maxQueued = tenant?.maxQueuedJobs ?? 5;
-  if (pending >= maxQueued)
-    throw new AppError(
-      429,
-      "TENANT_QUOTA",
-      `Tenant already has ${pending} queued or running jobs (limit ${maxQueued}).`,
-      { limit: maxQueued },
-      { "retry-after": "30" },
-    );
-
-  let inserted: JobRow | undefined;
-  try {
-    [inserted] = await ctx.db
-      .insert(jobs)
-      .values({
-        tenantId,
-        projectId: ds.projectId,
-        datasetId,
-        config,
-        label: input.label ?? null,
-        idempotencyKey: input.idempotencyKey ?? null,
-        requestHash,
-      })
-      .returning();
-  } catch (e) {
-    if (input.idempotencyKey && isUniqueViolation(e)) {
-      // Lost a race with a concurrent identical request: serve the winner.
-      const [winner] = await ctx.db
-        .select()
-        .from(jobs)
-        .where(and(eq(jobs.tenantId, tenantId), eq(jobs.idempotencyKey, input.idempotencyKey)));
-      if (winner) return replayOrReject(winner, requestHash);
-    }
-    throw e;
-  }
-  if (!inserted) throw new Error("insert returned no row");
-  const created = inserted;
-
-  // Snapshot the inputs: later dataset edits cannot change what this job reconstructs.
-  const manifestKey = keys.inputManifest(tenantId, datasetId, created.id);
+  // Snapshot the inputs first: later dataset edits cannot change what this job reconstructs, and a
+  // storage failure here leaves no job row behind (nothing to repair, no quota consumed).
+  const jobId = randomUUID();
+  const manifestKey = keys.inputManifest(tenantId, datasetId, jobId);
   await ctx.store.put(
     manifestKey,
     JSON.stringify({
       contract: WORKFLOW_CONTRACT,
       tenantId,
       datasetId,
-      jobId: created.id,
-      outputPrefix: keys.jobRoot(tenantId, created.id),
+      jobId,
+      outputPrefix: keys.jobRoot(tenantId, jobId),
       images: imgs.map((i) => ({
         imageId: i.id,
         filename: i.filename,
@@ -238,25 +210,71 @@ export async function createJob(
     }),
     "application/json",
   );
-  const now = ctx.now();
-  const [queued] = await ctx.db
-    .update(jobs)
-    .set({
-      state: "QUEUED",
-      queuedAt: now,
-      inputManifestKey: manifestKey,
-      workflowId: `reconstruct-${created.id}`,
-    })
-    .where(and(eq(jobs.id, created.id), eq(jobs.state, "CREATED")))
-    .returning();
-  if (!queued) throw new Error("job vanished during creation");
+
+  let outcome: { job: JobRow; replay: boolean };
+  try {
+    outcome = await ctx.db.transaction(async (tx) => {
+      // One creator per tenant at a time: the quota check and the insert below cannot interleave
+      // with another request's, and a concurrent identical Idempotency-Key finds the winner.
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${tenantId}))`);
+      if (input.idempotencyKey) {
+        const [prior] = await tx
+          .select()
+          .from(jobs)
+          .where(and(eq(jobs.tenantId, tenantId), eq(jobs.idempotencyKey, input.idempotencyKey)));
+        if (prior) return replayOrReject(prior, requestHash);
+      }
+      const [tenant] = await tx.select().from(tenants).where(eq(tenants.id, tenantId));
+      const [{ pending = 0 } = {}] = await tx
+        .select({ pending: count() })
+        .from(jobs)
+        .where(
+          and(eq(jobs.tenantId, tenantId), inArray(jobs.state, [...PENDING_START, ...ACTIVE])),
+        );
+      const maxQueued = tenant?.maxQueuedJobs ?? 5;
+      if (pending >= maxQueued)
+        throw new AppError(
+          429,
+          "TENANT_QUOTA",
+          `Tenant already has ${pending} queued or running jobs (limit ${maxQueued}).`,
+          { limit: maxQueued },
+          { "retry-after": "30" },
+        );
+      const [queued] = await tx
+        .insert(jobs)
+        .values({
+          id: jobId,
+          tenantId,
+          projectId: ds.projectId,
+          datasetId,
+          state: "QUEUED",
+          queuedAt: ctx.now(),
+          config,
+          label: input.label ?? null,
+          idempotencyKey: input.idempotencyKey ?? null,
+          requestHash,
+          inputManifestKey: manifestKey,
+          workflowId: `reconstruct-${jobId}`,
+        })
+        .returning();
+      if (!queued) throw new Error("insert returned no row");
+      return { job: queued, replay: false };
+    });
+  } catch (e) {
+    await ctx.store.delete(manifestKey).catch(() => undefined);
+    throw e;
+  }
+  if (outcome.replay) {
+    await ctx.store.delete(manifestKey).catch(() => undefined); // unused snapshot of a replayed request
+    return outcome;
+  }
   ctx.metrics.jobsCreated.inc({ replay: "false" });
   ctx.metrics.transitions.inc({ to: "QUEUED" });
-  await audit(ctx, tenantId, "job.create", "job", queued.id, input.requestId, {
+  await audit(ctx, tenantId, "job.create", "job", jobId, input.requestId, {
     datasetId,
     images: imgs.length,
   });
-  return { job: queued, replay: false };
+  return outcome;
 }
 
 function replayOrReject(prior: JobRow, requestHash: string) {
@@ -350,6 +368,14 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
     if (!row) throw notFound("job");
     const current = row.state as JobState;
     const now = ctx.now();
+    const cancelRequested = row.cancelRequestedAt !== null;
+
+    if (ev.type === "heartbeat") {
+      // Liveness only: stamp the row, store no event (one per ~5 s per job would grow without bound).
+      if (!isTerminal(current))
+        await tx.update(jobs).set({ lastHeartbeatAt: now }).where(eq(jobs.id, row.id));
+      return { applied: true, jobState: current, cancelRequested };
+    }
 
     const ins = await tx
       .insert(jobEvents)
@@ -477,9 +503,6 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
           ctx.metrics.stageDuration.observe({ stage: ev.stage }, seconds);
         break;
       }
-      case "heartbeat":
-        patch.lastHeartbeatAt = now;
-        break;
       case "attempt_failed": {
         await tx
           .update(jobAttempts)

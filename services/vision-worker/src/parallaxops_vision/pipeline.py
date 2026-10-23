@@ -64,6 +64,31 @@ def _classify_kill(res: SupervisedResult) -> Diagnostic | None:
     return None
 
 
+def read_engine_result(work: Path, res: SupervisedResult) -> dict[str, Any]:
+    """The engine's verdict, or a typed ReconstructionError: killed by a budget, crashed, or a
+    diagnostic the engine itself reported. Separated so it can be tested without running COLMAP."""
+    killed = _classify_kill(res)
+    if killed:
+        raise ReconstructionError(killed)
+    result_path = work / "engine_result.json"
+    if res.returncode != 0 or not result_path.exists():
+        tb = work / "engine_traceback.txt"
+        raise ReconstructionError(
+            Diagnostic.of(
+                DiagnosticCode.ENGINE_CRASH,
+                f"Engine exited with code {res.returncode}.",
+                stage="engine",
+                traceback_tail=tb.read_text(encoding="utf-8")[-1500:]
+                if tb.exists()
+                else res.log_tail[-1500:],
+            )
+        )
+    eng: dict[str, Any] = json.loads(result_path.read_text(encoding="utf-8"))
+    if not eng.get("ok"):
+        raise ReconstructionError(Diagnostic.model_validate(eng["diagnostic"]))
+    return eng
+
+
 def _eval_gt(
     rec: pycolmap.Reconstruction, prepared: list[PreparedImage], images_txt: Path
 ) -> dict[str, Any]:
@@ -217,25 +242,7 @@ def reconstruct(
             "peak_rss_bytes_process_tree": res.peak_rss_bytes,
             "note": "RSS is sampled every 0.5 s; peak may be slightly under-reported. No GPU used.",
         }
-        killed = _classify_kill(res)
-        if killed:
-            raise ReconstructionError(killed)
-        result_path = work / "engine_result.json"
-        if res.returncode != 0 or not result_path.exists():
-            tb = work / "engine_traceback.txt"
-            raise ReconstructionError(
-                Diagnostic.of(
-                    DiagnosticCode.ENGINE_CRASH,
-                    f"Engine exited with code {res.returncode}.",
-                    stage="engine",
-                    traceback_tail=tb.read_text(encoding="utf-8")[-1500:]
-                    if tb.exists()
-                    else res.log_tail[-1500:],
-                )
-            )
-        eng = json.loads(result_path.read_text(encoding="utf-8"))
-        if not eng.get("ok"):
-            raise ReconstructionError(Diagnostic.model_validate(eng["diagnostic"]))
+        eng = read_engine_result(work, res)
         invocation = eng["invocation"]
         timings.update({k: v for k, v in eng["stages_seconds"].items()})
         report["matching_graph"] = eng["matching_graph"]

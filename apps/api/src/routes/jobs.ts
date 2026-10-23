@@ -7,7 +7,7 @@ import {
   LIMITS,
   SceneSchema,
 } from "@parallaxops/contracts";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, ne } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
@@ -20,6 +20,7 @@ import {
   listJobs,
   requestCancel,
   serializeJob,
+  serializeJobs,
   startWorkflow,
 } from "../services/jobs.ts";
 
@@ -83,7 +84,7 @@ export function jobRoutes(app: FastifyInstance, ctx: Ctx) {
     },
     async (req) => {
       const rows = await listJobs(ctx, req.tenantId, req.params.projectId);
-      return Promise.all(rows.map((row) => serializeJob(ctx, row)));
+      return serializeJobs(ctx, rows);
     },
   );
 
@@ -128,19 +129,23 @@ export function jobRoutes(app: FastifyInstance, ctx: Ctx) {
       const rows = await ctx.db
         .select()
         .from(jobEvents)
-        .where(and(eq(jobEvents.jobId, req.params.jobId), eq(jobEvents.tenantId, req.tenantId)))
+        .where(
+          and(
+            eq(jobEvents.jobId, req.params.jobId),
+            eq(jobEvents.tenantId, req.tenantId),
+            ne(jobEvents.type, "heartbeat"), // rows stored before heartbeats became stamp-only
+          ),
+        )
         .orderBy(asc(jobEvents.id));
-      return rows
-        .filter((e) => e.type !== "heartbeat")
-        .map((e) => ({
-          seq: e.seq,
-          attemptNo: e.attemptNo,
-          type: e.type,
-          stage: e.stage,
-          fromState: e.fromState,
-          toState: e.toState,
-          at: e.createdAt.toISOString(),
-        }));
+      return rows.map((e) => ({
+        seq: e.seq,
+        attemptNo: e.attemptNo,
+        type: e.type,
+        stage: e.stage,
+        fromState: e.fromState,
+        toState: e.toState,
+        at: e.createdAt.toISOString(),
+      }));
     },
   );
 

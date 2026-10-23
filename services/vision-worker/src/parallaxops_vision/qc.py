@@ -59,10 +59,6 @@ class QCReport(BaseModel):
     total_bytes: int
     total_megapixels: float
 
-    @property
-    def accepted_names(self) -> list[str]:
-        return [i.name for i in self.images if "exact_duplicate" not in i.flags]
-
 
 def list_input_images(input_dir: Path) -> tuple[list[Path], list[RejectedImage]]:
     """List regular image files directly under input_dir. Never follows links out of the tree."""

@@ -194,21 +194,20 @@ async def run_reconstruction(inp: dict[str, Any]) -> dict[str, Any]:
         res = report.get("resources") or {}
         if "peak_rss_bytes_process_tree" in res:
             metrics.PEAK_RSS.set(res["peak_rss_bytes_process_tree"])
-        summary = {
-            k: report.get(v)
-            for k, v in {
-                "metrics": "metrics",
-                "quality": None,
-                "groundTruth": "ground_truth_eval",
-                "timings": "timings_seconds",
-                "resources": "resources",
-                "warnings": "warnings",
-            }.items()
-            if v
+        summary: dict[str, Any] = {
+            api_key: report[report_key]
+            for api_key, report_key in (
+                ("metrics", "metrics"),
+                ("groundTruth", "ground_truth_eval"),
+                ("timings", "timings_seconds"),
+                ("resources", "resources"),
+                ("warnings", "warnings"),
+            )
+            if report.get(report_key)
         }
         summary["quality"] = (report.get("metrics") or {}).get("quality")
-        if report.get("dense") and summary.get("metrics") is not None:
-            summary["metrics"] = {**summary["metrics"], "dense": report["dense"]}  # type: ignore[dict-item]
+        if report.get("dense") and "metrics" in summary:
+            summary["metrics"] = {**summary["metrics"], "dense": report["dense"]}
         for stage_name, secs in (report.get("timings_seconds") or {}).items():
             if stage_name != "total":
                 metrics.STAGE_SECONDS.labels(stage=stage_name).observe(secs)

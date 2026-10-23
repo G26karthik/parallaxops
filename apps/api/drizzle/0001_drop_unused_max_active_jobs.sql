@@ -1,0 +1,1 @@
+ALTER TABLE "tenants" DROP COLUMN "max_active_jobs";

@@ -83,7 +83,6 @@ function Up($only) {
       Start-Process -FilePath "$pgb\pg_ctl.exe" -ArgumentList @('start', '-D', $data, '-o', '"-p 5433 -c listen_addresses=127.0.0.1 -c shared_buffers=128MB -c max_connections=50"', '-l', (Join-Path $Logs 'postgres.log')) -WindowStyle Hidden | Out-Null
     }
     Wait-Port postgres 5433
-    & $Py -I -c "import socket,sys;s=socket.create_connection(('127.0.0.1',5433),3)" 2>$null
     # create the database on first boot (no psql shipped; use node `pg` through the API's migrate step)
   }
   if (& $want 's3') {

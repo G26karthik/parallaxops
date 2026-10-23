@@ -6,8 +6,6 @@ export const LIMITS = {
   maxDatasetBytes: 1_200_000_000,
   maxFilenameLength: 120,
   presignTtlSeconds: 900,
-  maxJobsQueuedPerTenant: 5,
-  maxActiveJobsPerTenant: 2,
 } as const;
 
 export const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png"] as const;

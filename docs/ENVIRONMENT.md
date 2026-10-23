@@ -14,7 +14,7 @@ lists are intentionally omitted.
 | Disk | 215 GiB free on the system drive |
 | WSL2 | Ubuntu available (state: running); a `docker-desktop` distro exists (stopped) |
 | Docker | Client 29.7.2 installed; **daemon not running** at audit time |
-| Node / pnpm | Node 22.23 (LTS) installed system-wide, pnpm 10.29 |
+| Node / pnpm | Node 22.23 and pnpm 10.29 installed system-wide and **not used**; the platform runs its own portable Node 26.12.1 and pnpm 12.15.0 from `$PARALLAXOPS_HOME/tools` |
 | Python | 3.11 and 3.13 system-wide; **3.14.2 used** via `uv` in an isolated venv |
 | Git / GitHub CLI | git 2.55, gh 2.100, authenticated |
 | `nvcc`, `cmake`, `colmap`, `make` | not installed |
@@ -43,14 +43,18 @@ lists are intentionally omitted.
 | pycolmap | 4.2.1 (`has_cuda = False`) |
 | COLMAP CLI (optional GPU / dense profile) | 4.2.1 `colmap-x64-windows-cuda` |
 | Open3D | 0.20.0 |
-| OpenCV | 5.0.0 |
+| OpenCV | 5.0.0 (`opencv-python-headless` 5.0.0.93) |
 | NumPy | 2.5.4 |
 | temporalio (Python SDK) | 1.34.0 |
 | Temporal CLI (dev server) | 1.9.1 |
 | ruff / mypy / pytest | 0.17.2 / 2.4.0 / 9.1.1 |
+| Playwright (browser tests) | 1.64.1, Chromium |
+| Node / pnpm | 26.12.1 / 12.15.0 (TypeScript 7, Next.js 16, Fastify 5) |
+| PostgreSQL | 18.6 on port 5433 |
+| SeaweedFS (S3 API) | 4.49 on port 8333 |
 
 ## Verified vs. not yet verified
 
-- Verified: hardware inventory above, CPU SfM end to end, GPU reported by `nvidia-smi`.
-- Not yet verified on this machine: COLMAP CUDA binary execution, Docker Compose services.
-  Status of each is tracked in `STATE.md` and the gate evidence in `docs/GATES.md`.
+- Verified: hardware inventory above, CPU SfM end to end, the whole native stack end to end
+  (`docs/GATES.md`, gates 2 and 3), and COLMAP CUDA dense reconstruction on the RTX 4060 (gate 5).
+- Not verified on this machine: Docker Compose services (the daemon was off; `infra/README.md`).

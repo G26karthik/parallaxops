@@ -23,7 +23,6 @@ export const tenants = pgTable("tenants", {
   createdAt: ts("created_at").notNull().defaultNow(),
   /** Quotas live on the row so they can be tuned per tenant without a deploy. */
   maxStorageBytes: bigint("max_storage_bytes", { mode: "number" }).notNull().default(5_000_000_000),
-  maxActiveJobs: integer("max_active_jobs").notNull().default(2),
   maxQueuedJobs: integer("max_queued_jobs").notNull().default(5),
 });
 

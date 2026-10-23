@@ -19,8 +19,8 @@ the host or read the data directory.
 | Object keys | `tenants/<tenant>/...` prefixes; user filenames never appear in keys (only generated ids); the API refuses to presign, and drops artifacts, outside the caller's prefix | `tenancy.test.ts`, `jobs.test.ts` |
 | Worker trust | The worker uses a shared secret for the internal endpoints (constant-time compare); the browser's tenant header never reaches them; the worker rejects a manifest whose keys leave the job's tenant/dataset prefix or contain `..` | `tenancy.test.ts`, `tests/test_worker.py` |
 | Uploads | Allow-list of types; size and count caps; `Content-Type` signed into the presigned URL; server-side magic-byte check and **full SHA-256 verification** after upload; mismatches are deleted; filenames sanitized (path separators, control characters, bidi characters) | `uploads.test.ts`, `contracts.test.ts` |
-| Presigned URLs | Short-lived (15 min), bound to one key and method; tampered signature, other key, or expiry rejected by the store | spike in `docs/GATES.md` (S3 section) |
-| CORS | Only the configured web origins on the API and on the bucket | S3 spike, `apps/api/src/app.ts` |
+| Presigned URLs | Short-lived (15 min), bound to one key and content type; a tampered signature, another key or another content type is rejected by the store (expiry is not tested) | `tests/e2e/test_presign.py` |
+| CORS | Only the configured web origins on the API and on the bucket (not tested end to end) | `apps/api/src/app.ts`, `scripts/dev.ps1` |
 | Process isolation | The SfM engine runs as `python -I` in a child process with argv arrays only (no shell, never `COLMAP.bat`), wall-clock/RSS/disk budgets, and kill-on-close Job Object | `tests/test_supervisor.py`, `test_resilience.py` |
 | Path traversal in inputs | Input listing never follows links out of the input tree; per-job scratch dirs are created by id, not from user data | `tests/test_qc.py` |
 | Error hygiene | Errors carry a request id and a code, never a stack trace or file path; request ids from clients are validated | `tenancy.test.ts` |

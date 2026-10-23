@@ -16,9 +16,11 @@ import {
   RequestUploadsBody,
   RequestUploadsResponse,
   sanitizeFilename,
+  UploadFileSchema,
+  UploadTargetSchema,
   WORKFLOW_CONTRACT,
 } from "@parallaxops/contracts";
-import { and, asc, count, desc, eq, inArray, ne, sum } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, ne, sql, sum } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
@@ -271,74 +273,96 @@ export function projectRoutes(app: FastifyInstance, ctx: Ctx) {
     },
     async (req, reply) => {
       const d = await getDataset(ctx, req.tenantId, req.params.datasetId);
-      const live = await ctx.db
-        .select()
-        .from(images)
-        .where(and(eq(images.datasetId, d.id), ne(images.status, "REJECTED")));
-      const bySha = new Map(live.map((i) => [i.sha256, i]));
-      const fresh = req.body.files.filter(
-        (f, idx, all) =>
-          !bySha.has(f.sha256) && all.findIndex((x) => x.sha256 === f.sha256) === idx,
-      );
-      if (live.length + fresh.length > LIMITS.maxFilesPerDataset)
-        throw new AppError(
-          413,
-          "TOO_MANY_FILES",
-          `A dataset holds at most ${LIMITS.maxFilesPerDataset} images.`,
-        );
-      const addBytes = fresh.reduce((a, f) => a + f.sizeBytes, 0);
-      if (live.reduce((a, i) => a + i.sizeBytes, 0) + addBytes > LIMITS.maxDatasetBytes)
-        throw new AppError(413, "DATASET_TOO_LARGE", "Dataset byte limit exceeded.");
-      const [t] = await ctx.db.select().from(tenants).where(eq(tenants.id, req.tenantId));
-      const [used] = await ctx.db
-        .select({ b: sum(images.sizeBytes) })
-        .from(images)
-        .where(and(eq(images.tenantId, req.tenantId), ne(images.status, "REJECTED")));
-      if (Number(used?.b ?? 0) + addBytes > (t?.maxStorageBytes ?? 5e9))
-        throw new AppError(429, "TENANT_STORAGE_QUOTA", "Tenant storage quota exceeded.");
 
-      const uploads = [];
-      const batch = new Map<string, string>();
-      const expires = new Date(ctx.now().getTime() + LIMITS.presignTtlSeconds * 1000);
-      for (const f of req.body.files) {
-        const existing = bySha.get(f.sha256);
-        const inBatch = batch.get(f.sha256);
-        if (existing || inBatch) {
-          uploads.push({
-            imageId: (existing?.id ?? inBatch) as string,
-            filename: sanitizeFilename(f.filename),
+      // Plan and insert under a per-dataset lock: the caps, the dedup check and the inserts cannot
+      // interleave with another request for the same dataset (two tabs, a double click).
+      const plan = await ctx.db.transaction(async (tx) => {
+        await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${d.id}))`);
+        const live = await tx
+          .select()
+          .from(images)
+          .where(and(eq(images.datasetId, d.id), ne(images.status, "REJECTED")));
+        const bySha = new Map(live.map((i) => [i.sha256, i.id]));
+        const fresh = req.body.files.filter(
+          (f, idx, all) =>
+            !bySha.has(f.sha256) && all.findIndex((x) => x.sha256 === f.sha256) === idx,
+        );
+        if (live.length + fresh.length > LIMITS.maxFilesPerDataset)
+          throw new AppError(
+            413,
+            "TOO_MANY_FILES",
+            `A dataset holds at most ${LIMITS.maxFilesPerDataset} images.`,
+          );
+        const addBytes = fresh.reduce((a, f) => a + f.sizeBytes, 0);
+        if (live.reduce((a, i) => a + i.sizeBytes, 0) + addBytes > LIMITS.maxDatasetBytes)
+          throw new AppError(413, "DATASET_TOO_LARGE", "Dataset byte limit exceeded.");
+        const [t] = await tx.select().from(tenants).where(eq(tenants.id, req.tenantId));
+        const [used] = await tx
+          .select({ b: sum(images.sizeBytes) })
+          .from(images)
+          .where(and(eq(images.tenantId, req.tenantId), ne(images.status, "REJECTED")));
+        if (Number(used?.b ?? 0) + addBytes > (t?.maxStorageBytes ?? 5e9))
+          throw new AppError(429, "TENANT_STORAGE_QUOTA", "Tenant storage quota exceeded.");
+
+        // Sequential on purpose: a repeat later in the same batch must see the earlier insert.
+        const out: {
+          f: z.infer<typeof UploadFileSchema>;
+          filename: string;
+          imageId: string;
+          upload: boolean;
+          key: string;
+        }[] = [];
+        for (const f of req.body.files) {
+          const filename = sanitizeFilename(f.filename);
+          const existing = bySha.get(f.sha256);
+          if (existing) {
+            out.push({ f, filename, imageId: existing, upload: false, key: "" });
+            continue;
+          }
+          const imageId = randomUUID();
+          const key = keys.image(req.tenantId, d.id, imageId, EXTENSION_BY_TYPE[f.contentType]);
+          await tx.insert(images).values({
+            id: imageId,
+            tenantId: req.tenantId,
+            datasetId: d.id,
+            filename,
+            contentType: f.contentType,
+            sizeBytes: f.sizeBytes,
             sha256: f.sha256,
-            action: "DUPLICATE" as const,
-            url: null,
-            headers: {},
-            expiresAt: null,
+            objectKey: key,
+            createdAt: ctx.now(),
           });
-          continue;
+          bySha.set(f.sha256, imageId);
+          out.push({ f, filename, imageId, upload: true, key });
         }
-        const imageId = randomUUID();
-        const key = keys.image(req.tenantId, d.id, imageId, EXTENSION_BY_TYPE[f.contentType]);
-        await ctx.db.insert(images).values({
-          id: imageId,
-          tenantId: req.tenantId,
-          datasetId: d.id,
-          filename: sanitizeFilename(f.filename),
-          contentType: f.contentType,
-          sizeBytes: f.sizeBytes,
-          sha256: f.sha256,
-          objectKey: key,
-          createdAt: ctx.now(),
-        });
-        batch.set(f.sha256, imageId);
-        uploads.push({
-          imageId,
-          filename: sanitizeFilename(f.filename),
-          sha256: f.sha256,
-          action: "UPLOAD" as const,
-          url: await ctx.store.presignPut(key, f.contentType, LIMITS.presignTtlSeconds),
-          headers: { "content-type": f.contentType },
-          expiresAt: iso(expires),
-        });
-      }
+        return out;
+      });
+
+      const expires = new Date(ctx.now().getTime() + LIMITS.presignTtlSeconds * 1000);
+      const uploads = await Promise.all(
+        plan.map(
+          async (p): Promise<z.infer<typeof UploadTargetSchema>> =>
+            p.upload
+              ? {
+                  imageId: p.imageId,
+                  filename: p.filename,
+                  sha256: p.f.sha256,
+                  action: "UPLOAD" as const,
+                  url: await ctx.store.presignPut(p.key, p.f.contentType, LIMITS.presignTtlSeconds),
+                  headers: { "content-type": p.f.contentType },
+                  expiresAt: iso(expires),
+                }
+              : {
+                  imageId: p.imageId,
+                  filename: p.filename,
+                  sha256: p.f.sha256,
+                  action: "DUPLICATE" as const,
+                  url: null,
+                  headers: {},
+                  expiresAt: null,
+                },
+        ),
+      );
       return reply.status(201).send({ uploads });
     },
   );

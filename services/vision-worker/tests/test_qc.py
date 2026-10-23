@@ -35,7 +35,6 @@ def test_exact_duplicate_flagged_and_excluded(image_dir: Path) -> None:
     pair = {"copy.jpg", "photo_00.jpg"}
     flagged = {i.name for i in rep.images if "exact_duplicate" in i.flags}
     assert len(flagged) == 1 and flagged < pair  # first in sorted order is kept
-    assert not (pair & set(rep.accepted_names)) >= pair
     assert rep.duplicate_groups == [sorted(pair)]
 
 
