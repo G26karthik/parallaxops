@@ -20,9 +20,9 @@ Resumable status file. Updated after every step. Newest first.
 |------|--------|
 | G0 environment audit | done, milestone closed |
 | G1 vision core | done, milestone closed |
-| G2 async vertical slice | done; evidence in docs/GATES.md; GitHub milestone still open |
-| G3 hardening | done (cancel, worker kill, API restart, races, presign tests); Docker Compose files UNVERIFIED; GitHub milestone still open |
-| G4 measurement | done; controller v1 did not meet H1 (honest write-up in docs/EXPERIMENTS.md); GitHub milestone still open |
+| G2 async vertical slice | done; evidence in docs/GATES.md; milestone closed |
+| G3 hardening | done (cancel, worker kill, API restart, races, presign tests); Docker Compose files UNVERIFIED; milestone closed |
+| G4 measurement | done; controller v1 did not meet H1 (honest write-up in docs/EXPERIMENTS.md); milestone closed |
 | G5 depth | partly done: dense MVS via COLMAP CUDA works. NOT done: masking comparison, true multi-resolution viewer |
 
 ## Ponytail audit (whole repo) — applied
@@ -36,10 +36,10 @@ Reported, NOT done (decide before doing):
 - `pipeline.reconstruct` is still ~250 lines (engine-result reading was extracted and tested).
 
 ## Next steps (ordered)
-1. Wait for the WSL Linux replica, push, confirm Actions green.
-2. Run the 2 real-data integration tests once (`pytest -m integration` in services/vision-worker) to cover the pipeline refactor with real COLMAP.
-3. Close GitHub milestones G2..G5 with evidence links (docs/GATES.md anchors).
-4. Optional: Docker Compose verification (starting Docker Desktop allowed; stopping it is not), re-measure worker-kill recovery, terminal demo SVG, masking experiment, controller v2 (new pre-registered plan).
+Audit fixes are pushed (CI green at 936ddd4); milestones G2-G4 are closed with evidence links. G5 stays open.
+1. G5 leftovers: dynamic-object masking comparison (separate venv), multi-resolution viewer.
+2. Audit items listed above that were reported but not done.
+3. Optional: Docker Compose verification (starting Docker Desktop allowed; stopping it is not), re-measure worker-kill recovery, terminal demo SVG, masking experiment, controller v2 (new pre-registered plan).
 
 ## GitHub
-- https://github.com/G26karthik/parallaxops (public), milestones G0-G5 (G0, G1 closed).
+- https://github.com/G26karthik/parallaxops (public), milestones G0-G5 (G0-G4 closed, G5 open).
