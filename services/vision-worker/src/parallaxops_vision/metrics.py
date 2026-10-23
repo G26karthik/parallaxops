@@ -44,6 +44,7 @@ class SfMMetrics(BaseModel):
     triangulation_angle_deg_median: float
     triangulation_angle_deg_p10: float
     extent_model_units: list[float]
+    per_image_error: list[dict[str, Any]]  # name, n_obs, mean reprojection error (px)
     cameras: list[dict[str, Any]]
     quality: QualityVerdict
     units_note: str = (
@@ -117,6 +118,23 @@ def compute_metrics(rec: pycolmap.Reconstruction, prepared: list[PreparedImage])
     xyz = np.array([p.xyz for p in pts]) if pts else np.zeros((1, 3))
     lo, hi = np.percentile(xyz, [1, 99], axis=0)
     scale_by_name = {p.safe_name: p.scale for p in prepared}
+    original = {p.safe_name: p.original_name for p in prepared}
+    per_image: list[dict[str, Any]] = []
+    for im in rec.images.values():
+        if not im.has_pose:
+            continue
+        e = [
+            rec.points3D[p.point3D_id].error
+            for p in im.points2D
+            if p.has_point3D() and p.point3D_id in rec.points3D
+        ]
+        per_image.append(
+            {
+                "name": original.get(im.name, im.name),
+                "n_obs": len(e),
+                "mean_error_px": round(float(np.mean(e)), 4) if e else None,
+            }
+        )
     cams = []
     for cid, c in sorted(rec.cameras.items()):
         # Express focal length at original resolution using the mean prepare scale.
@@ -156,6 +174,7 @@ def compute_metrics(rec: pycolmap.Reconstruction, prepared: list[PreparedImage])
         triangulation_angle_deg_median=round(med_ang, 3),
         triangulation_angle_deg_p10=round(float(np.percentile(ang, 10)), 3),
         extent_model_units=[round(float(x), 4) for x in (hi - lo)],
+        per_image_error=per_image,
         cameras=cams,
         quality=judge(frac, mean_err, mean_track, med_ang),
     )
