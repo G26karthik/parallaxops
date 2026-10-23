@@ -222,6 +222,7 @@ def run_controlled(
             "attempt": n,
             "config": cfg.model_dump(mode="json", exclude={"budgets", "qc"}),
             "wall_seconds": round(last_wall, 1),
+            "resources": report.get("resources"),
             "outcome": _summary(report),
             "diagnosis": {"family": family, "why": why},
         }

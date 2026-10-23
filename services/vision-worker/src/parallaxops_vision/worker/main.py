@@ -19,6 +19,7 @@ from .activities import (
     run_reconstruction,
     set_runtime,
 )
+from .scratch import sweep_orphans
 from .settings import Settings
 from .workflows import PreflightWorkflow, ReconstructionWorkflow
 
@@ -28,6 +29,18 @@ async def main() -> None:
     s = Settings()
     set_runtime(Runtime(s))
     metrics.serve(s.metrics_port)
+
+    async def sweep_forever() -> None:
+        """Reap scratch left behind by workers that were killed before they could clean up."""
+        while True:
+            removed, freed = sweep_orphans(s.scratch_dir)
+            if removed:
+                metrics.CLEANUP_BYTES.labels(outcome="orphan").inc(freed)
+                logging.getLogger(__name__).warning(
+                    "swept %d orphaned scratch dirs (%d bytes)", removed, freed
+                )
+            await asyncio.sleep(600)
+
     client = await Client.connect(s.temporal_address, namespace=s.temporal_namespace)
 
     workflows_worker = Worker(
@@ -57,7 +70,9 @@ async def main() -> None:
         s.metrics_port,
         s.temporal_address,
     )
-    await asyncio.gather(workflows_worker.run(), light_worker.run(), heavy_worker.run())
+    await asyncio.gather(
+        workflows_worker.run(), light_worker.run(), heavy_worker.run(), sweep_forever()
+    )
 
 
 if __name__ == "__main__":

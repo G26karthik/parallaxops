@@ -1,0 +1,27 @@
+{
+  "attempts": [
+    [
+      1,
+      "FAILED"
+    ],
+    [
+      2,
+      "SUCCEEDED"
+    ]
+  ],
+  "recovery_seconds": 99.2,
+  "timeline": [
+    [
+      0.0,
+      "RECONSTRUCTING"
+    ],
+    [
+      97.2,
+      "EVALUATING"
+    ],
+    [
+      99.2,
+      "COMPLETED"
+    ]
+  ]
+}

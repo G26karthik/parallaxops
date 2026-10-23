@@ -4,6 +4,7 @@ publish) so scratch never needs to be shared between hosts; the workflow reports
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import re
 import threading
 import time
@@ -21,6 +22,7 @@ from ..qc import run_qc
 from . import WORKFLOW_CONTRACT, metrics
 from .api_client import ApiClient, EventSender
 from .artifacts import publish, remove_tree
+from .scratch import claim
 from .settings import Settings
 from .storage import InputManifest, Store
 
@@ -124,6 +126,7 @@ async def run_reconstruction(inp: dict[str, Any]) -> dict[str, Any]:
     sender = EventSender(r.api, job_id, attempt, r.settings.worker_id)
     attempt_dir = r.settings.scratch_dir / job_id / f"attempt-{attempt}"
     in_dir, out_dir = attempt_dir / "in", attempt_dir / "out"
+    claim(attempt_dir)  # records this process as owner so a sweeper can reap it if we are killed
     cancel = threading.Event()
     outcome = "failed"
 
@@ -233,6 +236,8 @@ async def run_reconstruction(inp: dict[str, Any]) -> dict[str, Any]:
     finally:
         metrics.ACTIVE_HEAVY.dec()
         freed = remove_tree(attempt_dir)
+        with contextlib.suppress(OSError):
+            attempt_dir.parent.rmdir()  # drop the now-empty job directory (no-op if another attempt exists)
         metrics.CLEANUP_BYTES.labels(outcome=outcome).inc(freed)
         metrics.ACTIVITIES.labels(activity="run_reconstruction", outcome=outcome).inc()
 
@@ -277,6 +282,7 @@ async def run_preflight(inp: dict[str, Any]) -> dict[str, Any]:
     r = rt()
     scratch = r.settings.scratch_dir / "preflight" / f"{inp['datasetId']}-{int(time.time())}"
     outcome = "failed"
+    claim(scratch)
     try:
         manifest = await asyncio.to_thread(load_manifest, r.store, inp)
         await _beat("downloading")

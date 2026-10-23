@@ -31,10 +31,15 @@ REPO = Path(__file__).resolve().parents[2]
 
 
 def dev(*args: str) -> None:
+    # DEVNULL, not capture_output: a service started by dev.ps1 would inherit our stdout pipe and
+    # keep it open, so subprocess.run would block until that service exits.
     subprocess.run(
         ["powershell", "-NoProfile", "-File", str(REPO / "scripts" / "dev.ps1"), *args],
         check=True,
-        capture_output=True,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        timeout=180,
         env={**os.environ, "PARALLAXOPS_HOME": str(HOME)},
     )
 

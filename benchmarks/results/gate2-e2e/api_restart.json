@@ -1,0 +1,26 @@
+{
+  "timeline": [
+    [
+      0.0,
+      "PREPROCESSING"
+    ],
+    [
+      15.7,
+      "RECONSTRUCTING"
+    ],
+    [
+      70.4,
+      "EVALUATING"
+    ],
+    [
+      72.5,
+      "COMPLETED"
+    ]
+  ],
+  "attempts": [
+    [
+      1,
+      "SUCCEEDED"
+    ]
+  ]
+}
