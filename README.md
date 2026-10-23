@@ -84,7 +84,7 @@ $d = "$env:PARALLAXOPS_HOME\data\eth3d\terrace\terrace"
   --ground-truth "$d\dslr_calibration_jpg\images.txt"
 ```
 
-On Linux the Open3D wheel needs system libraries: `sudo apt-get install libusb-1.0-0 libgomp1 libgl1`.
+On Linux the Open3D wheel needs system libraries: `sudo apt-get install libusb-1.0-0 libgomp1 libgl1 libegl1`.
 Run the same checks as CI before pushing with `python scripts/check.py`
 (`git config core.hooksPath .githooks` enables it as a pre-push hook).
 
