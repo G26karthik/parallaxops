@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "types": ["node"],
+    "allowJs": false,
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["next-env.d.ts", "src", "test", "next.config.ts", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

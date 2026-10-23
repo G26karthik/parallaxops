@@ -1,0 +1,14 @@
+{
+  "name": "@parallaxops/apigen",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generates typed API client definitions from docs/openapi.json. Isolated because openapi-typescript needs the TypeScript 6 JS API, which TypeScript 7 does not ship.",
+  "scripts": {
+    "generate": "openapi-typescript ../../docs/openapi.json -o ../../apps/web/src/lib/api-types.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0",
+    "typescript": "6.0.3"
+  }
+}

@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/* Design tokens: a calm instrument-panel palette. Both themes meet WCAG AA for body text. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0d10;
+  --panel: #12161b;
+  --panel-2: #181d24;
+  --line: #262e38;
+  --text: #e8ecf1;
+  --muted: #a0aab8;
+  --accent: #f2b441;
+  --accent-ink: #1a1305;
+  --teal: #4cc2c4;
+  --good: #62d28d;
+  --warn: #f2b441;
+  --bad: #f07272;
+  --focus: #7cc4ff;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #f4f1ea;
+    --panel: #fffdf8;
+    --panel-2: #f0ece2;
+    --line: #d9d3c5;
+    --text: #1b1f24;
+    --muted: #55606e;
+    --accent: #a55f00;
+    --accent-ink: #fffaf0;
+    --teal: #0b7a7c;
+    --good: #1c7a45;
+    --warn: #8a5a00;
+    --bad: #b3261e;
+    --focus: #0a58ca;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel2: var(--panel-2);
+  --color-line: var(--line);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-teal: var(--teal);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+}
+
+html {
+  background: var(--bg);
+}
+body {
+  background:
+    radial-gradient(
+      1200px 500px at 85% -10%,
+      color-mix(in srgb, var(--accent) 7%, transparent),
+      transparent 60%
+    ),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background 120ms;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+  font-weight: 600;
+}
+.btn-danger:hover:not(:disabled) {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.875rem;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--panel-2), var(--line), var(--panel-2));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes pulse-dot {
+  50% {
+    opacity: 0.35;
+  }
+}
+.pulse {
+  animation: pulse-dot 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .pulse {
+    animation: none;
+  }
+}
+.skip-link {
+  position: absolute;
+  left: -999px;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 50;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+}

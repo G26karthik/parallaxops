@@ -1,0 +1,35 @@
+{
+  "name": "@parallaxops/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --webpack -p 3000",
+    "build": "next build --webpack",
+    "start": "next start -p 3000 -H 127.0.0.1",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "api-types": "openapi-typescript ../../docs/openapi.json -o src/lib/api-types.ts"
+  },
+  "dependencies": {
+    "@parallaxops/contracts": "workspace:*",
+    "@tanstack/react-query": "^5.104.5",
+    "next": "^16.4.2",
+    "openapi-fetch": "^0.17.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "latest",
+    "@types/node": "^26.6.5",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/three": "latest",
+    "axe-core": "^4.14.0",
+    "postcss": "latest",
+    "tailwindcss": "latest",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
