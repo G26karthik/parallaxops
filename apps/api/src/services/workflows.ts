@@ -18,7 +18,11 @@ export interface WorkflowStarter {
 }
 
 export class TemporalStarter implements WorkflowStarter {
-  private constructor(private readonly client: Client) {}
+  private readonly client: Client;
+
+  private constructor(client: Client) {
+    this.client = client;
+  }
 
   static async connect(cfg: Config): Promise<TemporalStarter> {
     const connection = await Connection.connect({ address: cfg.TEMPORAL_ADDRESS });

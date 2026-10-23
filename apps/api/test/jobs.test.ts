@@ -241,8 +241,11 @@ describe("cancellation", () => {
     expect(r.body.state).toBe("PREPROCESSING"); // worker must confirm the teardown
     const hb = await ev(job.id, "heartbeat");
     expect(hb.cancelRequested).toBe(true);
-    const done = await ev(job.id, "cancelled", { state: "CANCELLED" });
+    // The workflow reports with a synthetic attempt number; the running attempt must still close.
+    const done = await ev(job.id, "cancelled", { state: "CANCELLED", attemptNo: 99 });
     expect(done.jobState).toBe("CANCELLED");
+    const after = (await c.get(`/v1/jobs/${job.id}`)).body;
+    expect(after.attempts.map((a: { state: string }) => a.state)).toEqual(["CANCELLED"]);
   });
 });
 

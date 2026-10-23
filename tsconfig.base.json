@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
     "noEmit": true
   }
 }

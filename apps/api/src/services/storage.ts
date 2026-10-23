@@ -37,8 +37,10 @@ export class S3Store implements ObjectStore {
   private readonly client: S3Client;
   /** Separate client whose endpoint is what the browser can reach. */
   private readonly presigner: S3Client;
+  private readonly cfg: Config;
 
-  constructor(private readonly cfg: Config) {
+  constructor(cfg: Config) {
+    this.cfg = cfg;
     const base = {
       region: cfg.S3_REGION,
       forcePathStyle: true,

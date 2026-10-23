@@ -1,7 +1,7 @@
 import { buildApp } from "./app.ts";
 import { loadConfig } from "./config.ts";
 import type { Ctx } from "./context.ts";
-import { connectPg, migratePostgres } from "./db/client.ts";
+import { connectPg, ensureDatabase, migratePostgres } from "./db/client.ts";
 import { createMetrics } from "./metrics.ts";
 import { runCleanup } from "./services/cleanup.ts";
 import { reconcileUnstarted } from "./services/jobs.ts";
@@ -10,6 +10,7 @@ import { TemporalStarter } from "./services/workflows.ts";
 
 async function main() {
   const cfg = loadConfig();
+  if (cfg.NODE_ENV !== "production") await ensureDatabase(cfg.DATABASE_URL);
   await migratePostgres(cfg.DATABASE_URL);
   const handle = connectPg(cfg.DATABASE_URL);
   const store = new S3Store(cfg);

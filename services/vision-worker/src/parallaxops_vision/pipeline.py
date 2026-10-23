@@ -122,15 +122,50 @@ def reconstruct(
             }
         )
 
+    def sub(name: str, phase: str, seconds: float | None = None) -> None:
+        """Fine-grained stage event (qc, feature_matching, ...) for live timelines."""
+        emit(
+            {
+                "stage": "SUBSTAGE",
+                "state": phase,
+                "substage": name,
+                "seconds": seconds,
+                "elapsed": round(time.perf_counter() - t_start, 2),
+            }
+        )
+
+    progress_offset = 0
+
+    def drain_engine_progress() -> None:
+        """Forward the engine's append-only progress.jsonl as sub-stage events (complete lines only)."""
+        nonlocal progress_offset
+        path = work / "progress.jsonl"
+        if not path.exists():
+            return
+        with path.open("rb") as f:
+            f.seek(progress_offset)
+            data = f.read()
+        end = data.rfind(b"\n")
+        if end < 0:
+            return
+        progress_offset += end + 1
+        for line in data[: end + 1].splitlines():
+            rec = json.loads(line)
+            sub(rec["stage"], rec["state"], rec.get("seconds"))
+
     try:
         stage("PREPROCESSING", "start")
+        sub("qc", "start")
         t = time.perf_counter()
         qc = run_qc(input_dir, cfg)
         timings["qc"] = round(time.perf_counter() - t, 3)
+        sub("qc", "end", timings["qc"])
         write_json(staging / "qc_report.json", qc.model_dump(mode="json"))
+        sub("prepare_images", "start")
         t = time.perf_counter()
         prepared = prepare_images(input_dir, qc, cfg, work / "images")
         timings["prepare_images"] = round(time.perf_counter() - t, 3)
+        sub("prepare_images", "end", timings["prepare_images"])
         report["qc_summary"] = {
             "n_images": len(qc.images),
             "n_used": len(prepared),
@@ -161,6 +196,7 @@ def reconstruct(
 
         def tick(info: dict[str, Any]) -> None:
             stage("RECONSTRUCTING", "heartbeat", **info)
+            drain_engine_progress()
 
         res = run_supervised(
             [sys.executable, "-I", "-m", "parallaxops_vision.engine", str(work / "request.json")],
@@ -173,6 +209,7 @@ def reconstruct(
             cancel=cancel,
             on_tick=tick,
         )
+        drain_engine_progress()  # events written between the last tick and process exit
         report["resources"] = {
             "engine_wall_seconds": res.wall_seconds,
             "engine_cpu_seconds": res.cpu_seconds,
@@ -205,10 +242,12 @@ def reconstruct(
         stage("RECONSTRUCTING", "end")
 
         stage("EVALUATING", "start")
+        sub("metrics", "start")
         t = time.perf_counter()
         rec = pycolmap.Reconstruction(work / eng["best_model_dir"])
         metrics: SfMMetrics = compute_metrics(rec, prepared)
         timings["metrics"] = round(time.perf_counter() - t, 3)
+        sub("metrics", "end", timings["metrics"])
         report["metrics"] = metrics.model_dump(mode="json")
         if metrics.n_registered < 3 or metrics.registered_fraction < 0.3:
             raise ReconstructionError(
@@ -237,6 +276,7 @@ def reconstruct(
             )
 
         # --- export into the staging dir ---
+        sub("export", "start")
         t = time.perf_counter()
         n_pts = write_ply(rec, staging / "points_sparse.ply")
         write_json(staging / "cameras.json", camera_poses(rec, prepared))
@@ -244,6 +284,7 @@ def reconstruct(
         sparse_out.mkdir(parents=True)
         rec.write_binary(str(sparse_out))
         timings["export"] = round(time.perf_counter() - t, 3)
+        sub("export", "end", timings["export"])
         if gt_images_txt is not None:
             report["ground_truth_eval"] = _eval_gt(rec, prepared, gt_images_txt)
         report["points_exported"] = n_pts

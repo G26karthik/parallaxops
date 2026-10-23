@@ -1,0 +1,275 @@
+{
+  "submit_ms": 45.6,
+  "timeline": [
+    [
+      0.0,
+      "QUEUED"
+    ],
+    [
+      0.5,
+      "PREPROCESSING"
+    ],
+    [
+      24.8,
+      "RECONSTRUCTING"
+    ],
+    [
+      84.6,
+      "EVALUATING"
+    ],
+    [
+      87.1,
+      "COMPLETED"
+    ]
+  ],
+  "job": {
+    "id": "991a19d3-72a9-4987-8c21-3c5d890faabc",
+    "projectId": "c06d3e6b-d2a4-4af6-8732-73f21c970bcc",
+    "datasetId": "69983993-facd-4a74-8679-b63229ca2423",
+    "state": "COMPLETED",
+    "config": {
+      "maxImageSize": 1600,
+      "maxNumFeatures": 8192,
+      "mapper": "incremental",
+      "matching": "auto",
+      "cameraModel": "SIMPLE_RADIAL",
+      "seed": 0
+    },
+    "label": "e2e baseline",
+    "createdAt": "2026-10-23T20:17:59.180Z",
+    "queuedAt": "2026-10-23T20:17:59.188Z",
+    "startedAt": "2026-10-23T20:17:59.260Z",
+    "finishedAt": "2026-10-23T20:19:26.271Z",
+    "queueWaitSeconds": 0.072,
+    "durationSeconds": 87.011,
+    "quality": {
+      "level": "good",
+      "reasons": [
+        "all rubric thresholds met"
+      ],
+      "rubric": "Heuristic rubric, not accuracy: good = >=90% images registered, mean reprojection <=1.0 px, mean track length >=3.5, median triangulation angle >=3 deg. poor = <60% registered, mean reprojection >2.0 px, or median triangulation angle <1.5 deg. Otherwise fair. Low reprojection error does not prove geometric accuracy."
+    },
+    "metrics": {
+      "cameras": [
+        {
+          "model": "SIMPLE_RADIAL",
+          "width": 1600,
+          "height": 1067,
+          "params": [
+            896.5021706367937,
+            800,
+            533.5,
+            -0.041278068149099095
+          ],
+          "camera_id": 1,
+          "focal_px_working": 896.502,
+          "prior_focal_from_exif": false,
+          "focal_px_original_resolution": 3388.782
+        }
+      ],
+      "quality": {
+        "level": "good",
+        "rubric": "Heuristic rubric, not accuracy: good = >=90% images registered, mean reprojection <=1.0 px, mean track length >=3.5, median triangulation angle >=3 deg. poor = <60% registered, mean reprojection >2.0 px, or median triangulation angle <1.5 deg. Otherwise fair. Low reprojection error does not prove geometric accuracy.",
+        "reasons": [
+          "all rubric thresholds met"
+        ]
+      },
+      "n_points3d": 5438,
+      "units_note": "Model units are arbitrary (monocular). Reprojection error is in pixels at working resolution. Point count is not an accuracy measure.",
+      "n_registered": 23,
+      "unregistered": [],
+      "n_input_images": 23,
+      "n_observations": 21314,
+      "track_length_hist": {
+        "2": 482,
+        "3": 2414,
+        "4": 1176,
+        "10+": 55,
+        "5-9": 1311
+      },
+      "track_length_mean": 3.919,
+      "extent_model_units": [
+        46.3975,
+        25.439,
+        64.1547
+      ],
+      "registered_fraction": 1,
+      "reproj_error_px_max": 3.3656,
+      "reproj_error_px_p90": 1.4925,
+      "track_length_median": 3,
+      "reproj_error_px_mean": 0.8497,
+      "reproj_error_px_median": 0.7695,
+      "mean_observations_per_image": 926.7,
+      "triangulation_angle_deg_p10": 3.322,
+      "triangulation_angle_deg_median": 10.934
+    },
+    "groundTruth": null,
+    "timings": {
+      "qc": 5.671,
+      "total": 80.611,
+      "export": 0.092,
+      "metrics": 0.264,
+      "prepare_images": 14.972,
+      "sparse_mapping": 7.931,
+      "feature_matching": 41.002,
+      "feature_extraction": 9.765
+    },
+    "resources": {
+      "note": "RSS is sampled every 0.5 s; peak may be slightly under-reported. No GPU used.",
+      "engine_cpu_seconds": 412.61,
+      "engine_wall_seconds": 59.608,
+      "peak_rss_bytes_process_tree": 4122300416
+    },
+    "warnings": [],
+    "diagnostic": null,
+    "stages": [
+      {
+        "name": "download_inputs",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:17:59.276Z",
+        "finishedAt": "2026-10-23T20:18:02.567Z",
+        "seconds": 3.279
+      },
+      {
+        "name": "qc",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:18:03.590Z",
+        "finishedAt": "2026-10-23T20:18:08.635Z",
+        "seconds": 5.671
+      },
+      {
+        "name": "prepare_images",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:18:08.643Z",
+        "finishedAt": "2026-10-23T20:18:23.769Z",
+        "seconds": 14.972
+      },
+      {
+        "name": "feature_extraction",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:18:24.801Z",
+        "finishedAt": "2026-10-23T20:18:33.897Z",
+        "seconds": 9.765
+      },
+      {
+        "name": "feature_matching",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:18:33.903Z",
+        "finishedAt": "2026-10-23T20:19:15.355Z",
+        "seconds": 41.002
+      },
+      {
+        "name": "sparse_mapping",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:19:15.361Z",
+        "finishedAt": "2026-10-23T20:19:23.415Z",
+        "seconds": 7.931
+      },
+      {
+        "name": "metrics",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:19:23.429Z",
+        "finishedAt": "2026-10-23T20:19:23.441Z",
+        "seconds": 0.264
+      },
+      {
+        "name": "export",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:19:23.450Z",
+        "finishedAt": "2026-10-23T20:19:23.457Z",
+        "seconds": 0.092
+      },
+      {
+        "name": "publish_artifacts",
+        "state": "DONE",
+        "startedAt": "2026-10-23T20:19:25.809Z",
+        "finishedAt": "2026-10-23T20:19:26.162Z",
+        "seconds": 0.334
+      }
+    ],
+    "attempts": [
+      {
+        "attemptNo": 1,
+        "state": "SUCCEEDED",
+        "workerId": "G26Karthik-40592",
+        "startedAt": "2026-10-23T20:17:59.260Z",
+        "finishedAt": "2026-10-23T20:19:26.271Z",
+        "failure": null
+      }
+    ],
+    "artifacts": [
+      {
+        "kind": "points_ply",
+        "bytes": 147033,
+        "sha256": "cb1b335f3ac1bd25ec06dcbc37c4f2e02397e821b5fd913a7f9bef7841335ac7",
+        "contentType": "application/octet-stream"
+      },
+      {
+        "kind": "cameras",
+        "bytes": 26878,
+        "sha256": "3047cf7d2da2bd20388afb978404209eaa0fba23adf7fa0b6fb0104d9deb4fe9",
+        "contentType": "application/json"
+      },
+      {
+        "kind": "report",
+        "bytes": 4238,
+        "sha256": "86c4a98cd391d09d95a660b1bf74ad9bbb674da62b379dce1862c34e8a1b94e6",
+        "contentType": "application/json"
+      },
+      {
+        "kind": "qc_report",
+        "bytes": 11207,
+        "sha256": "38d031353a92c12593b5acbd2e6aee390574516c3b23cb9d81faff14801be4d8",
+        "contentType": "application/json"
+      },
+      {
+        "kind": "render_oblique",
+        "bytes": 241718,
+        "sha256": "eda74d34e17e803f5908e5bbd57ba6f9425eb79b8fe26f6dd3333697d58c0e51",
+        "contentType": "image/png"
+      },
+      {
+        "kind": "render_top",
+        "bytes": 123356,
+        "sha256": "9d7908ee4940aada9d8d2e703854536379e973704cb16c02f6f6a63da31e0d3a",
+        "contentType": "image/png"
+      },
+      {
+        "kind": "render_front",
+        "bytes": 150517,
+        "sha256": "00017a0a1ecf656c2676f6d4465188087f8a0be07e6a78e788636ed528e80ae3",
+        "contentType": "image/png"
+      },
+      {
+        "kind": "render_metrics",
+        "bytes": 62559,
+        "sha256": "25ac76ac11705cda7e8128890193f26420a8aa514f65453bf6ac383f707ff446",
+        "contentType": "image/png"
+      },
+      {
+        "kind": "engine_log",
+        "bytes": 24707,
+        "sha256": "fdcc644a214ce7caaa047828efc55a31006fce656c13dc66ff4804713ea74c9e",
+        "contentType": "text/plain"
+      },
+      {
+        "kind": "points_preview",
+        "bytes": 81586,
+        "sha256": "19105769bbb9b0cab8eb09e5f96ff49f6ce9663542f6c03280e69efbebb1210d",
+        "contentType": "application/octet-stream"
+      },
+      {
+        "kind": "colmap_sparse",
+        "bytes": 1581823,
+        "sha256": "3a21543a603e6abe5023280d00d3b4e58248a4b206620ab507e6ee73af3c859e",
+        "contentType": "application/zip"
+      },
+      {
+        "kind": "manifest",
+        "bytes": 17256,
+        "sha256": "8c1f74d136b3ac49262a1f63a7eaa77d67292b6de4b96f71ac1cc6255814ae62",
+        "contentType": "application/json"
+      }
+    ]
+  }
+}

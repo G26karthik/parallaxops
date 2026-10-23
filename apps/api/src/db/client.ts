@@ -22,6 +22,22 @@ export function connectPg(url: string, max = 10): DbHandle {
   return { db: drizzlePg(pool, { schema }), close: () => pool.end(), pool };
 }
 
+/** Dev convenience: create the target database on first boot (the portable server ships no psql). */
+export async function ensureDatabase(url: string): Promise<void> {
+  const u = new URL(url);
+  const name = decodeURIComponent(u.pathname.slice(1));
+  if (!/^[A-Za-z0-9_]+$/.test(name)) throw new Error("unsafe database name");
+  u.pathname = "/postgres";
+  const admin = new pg.Client({ connectionString: u.toString() });
+  await admin.connect();
+  try {
+    const r = await admin.query("select 1 from pg_database where datname = $1", [name]);
+    if (r.rowCount === 0) await admin.query(`create database "${name}"`);
+  } finally {
+    await admin.end();
+  }
+}
+
 export async function migratePostgres(url: string): Promise<void> {
   const h = connectPg(url, 1);
   try {

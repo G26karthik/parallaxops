@@ -518,7 +518,9 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
             finishedAt: now,
             failure: (p.diagnostic as Record<string, unknown>) ?? null,
           })
-          .where(and(eq(jobAttempts.jobId, row.id), eq(jobAttempts.attemptNo, ev.attemptNo)));
+          // Workflow-originated terminal events carry a synthetic attempt number; close whatever
+          // attempt is still running instead of matching on it.
+          .where(and(eq(jobAttempts.jobId, row.id), eq(jobAttempts.state, "RUNNING")));
         target = "FAILED";
         break;
       }
@@ -526,7 +528,7 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
         await tx
           .update(jobAttempts)
           .set({ state: "CANCELLED", finishedAt: now })
-          .where(and(eq(jobAttempts.jobId, row.id), eq(jobAttempts.attemptNo, ev.attemptNo)));
+          .where(and(eq(jobAttempts.jobId, row.id), eq(jobAttempts.state, "RUNNING")));
         target = "CANCELLED";
         break;
       }

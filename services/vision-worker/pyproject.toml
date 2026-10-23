@@ -48,7 +48,7 @@ files = ["src"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["pycolmap", "pycolmap.*", "open3d", "open3d.*", "cv2", "matplotlib.*"]
+module = ["pycolmap", "pycolmap.*", "open3d", "open3d.*", "cv2", "matplotlib.*", "boto3", "boto3.*", "botocore", "botocore.*"]
 follow_imports = "skip"
 ignore_missing_imports = true
 ignore_errors = false
@@ -60,3 +60,4 @@ markers = [
   "gpu: needs a CUDA-capable COLMAP build",
 ]
 addopts = "-ra"
+

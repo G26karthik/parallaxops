@@ -1,0 +1,40 @@
+{
+  "timeline": [
+    [
+      0.0,
+      "QUEUED"
+    ],
+    [
+      0.5,
+      "PREPROCESSING"
+    ],
+    [
+      1.5,
+      "RECONSTRUCTING"
+    ],
+    [
+      2.0,
+      "FAILED"
+    ]
+  ],
+  "diagnostic": {
+    "code": "INSUFFICIENT_MATCHES",
+    "message": "No image pair passed geometric verification.",
+    "advice": "Consecutive views share too little content. Move in smaller steps so each photo overlaps its neighbours by 60-80%.",
+    "stage": "feature_matching",
+    "details": {
+      "verified_pairs": 0,
+      "median_keypoints": 622,
+      "connected_components": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "inlier_counts_median": 0,
+      "images_with_keypoints": 6
+    }
+  }
+}

@@ -1,12 +1,22 @@
 export class AppError extends Error {
+  readonly status: number;
+  readonly code: string;
+  readonly details?: unknown;
+  readonly headers?: Record<string, string>;
+
+  // No parameter properties: Node runs this file directly by stripping types (erasableSyntaxOnly).
   constructor(
-    readonly status: number,
-    readonly code: string,
+    status: number,
+    code: string,
     message: string,
-    readonly details?: unknown,
-    readonly headers?: Record<string, string>,
+    details?: unknown,
+    headers?: Record<string, string>,
   ) {
     super(message);
+    this.status = status;
+    this.code = code;
+    this.details = details;
+    this.headers = headers;
   }
 }
 
