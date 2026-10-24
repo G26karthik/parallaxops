@@ -12,10 +12,11 @@ import {
   WORKFLOW_CONTRACT,
   type WorkerEvent,
 } from "@parallaxops/contracts";
-import { and, asc, count, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNull, lt, sql } from "drizzle-orm";
 import type { Ctx } from "../context.ts";
 import { schema } from "../db/client.ts";
 import { AppError, conflict, notFound } from "../errors.ts";
+import { afterCursor, newestFirst } from "./paging.ts";
 
 const { jobs, jobAttempts, jobStages, jobEvents, artifacts, images, datasets, tenants, auditLog } =
   schema;
@@ -627,13 +628,26 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
 // Listing helpers
 // ---------------------------------------------------------------------------------------------
 
-export async function listJobs(ctx: Ctx, tenantId: string, projectId?: string, limit = 50) {
+/** One page of jobs, newest first (`limit + 1` rows: see `cutPage`). */
+export async function listJobs(
+  ctx: Ctx,
+  tenantId: string,
+  projectId: string | undefined,
+  limit: number,
+  cursor?: string,
+) {
   return ctx.db
     .select()
     .from(jobs)
-    .where(and(eq(jobs.tenantId, tenantId), projectId ? eq(jobs.projectId, projectId) : undefined))
-    .orderBy(desc(jobs.createdAt))
-    .limit(limit);
+    .where(
+      and(
+        eq(jobs.tenantId, tenantId),
+        projectId ? eq(jobs.projectId, projectId) : undefined,
+        afterCursor(jobs.createdAt, jobs.id, cursor),
+      ),
+    )
+    .orderBy(...newestFirst(jobs.createdAt, jobs.id))
+    .limit(limit + 1);
 }
 
 export async function refreshActiveGauge(ctx: Ctx) {

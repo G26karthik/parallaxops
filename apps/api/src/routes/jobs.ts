@@ -23,6 +23,7 @@ import {
   serializeJobs,
   startWorkflow,
 } from "../services/jobs.ts";
+import { cutPage, PageQuery } from "../services/paging.ts";
 
 const { artifacts, jobEvents } = schema;
 const JobIdParam = z.object({ jobId: z.uuid() });
@@ -79,12 +80,18 @@ export function jobRoutes(app: FastifyInstance, ctx: Ctx) {
       schema: {
         ...tag,
         params: z.object({ projectId: z.uuid() }),
+        querystring: PageQuery,
         response: { 200: z.array(JobSchema) },
       },
     },
-    async (req) => {
-      const rows = await listJobs(ctx, req.tenantId, req.params.projectId);
-      return serializeJobs(ctx, rows);
+    async (req, reply) => {
+      const limit = req.query.limit ?? 50;
+      const { items, next } = cutPage(
+        await listJobs(ctx, req.tenantId, req.params.projectId, limit, req.query.cursor),
+        limit,
+      );
+      if (next) reply.header("x-next-cursor", next);
+      return serializeJobs(ctx, items);
     },
   );
 

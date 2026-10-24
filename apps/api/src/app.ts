@@ -35,7 +35,7 @@ export async function buildApp(
     origin: ctx.cfg.corsOrigins,
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["content-type", "x-tenant-id", "idempotency-key", "x-request-id"],
-    exposedHeaders: ["x-request-id", "location", "retry-after"],
+    exposedHeaders: ["x-request-id", "location", "retry-after", "x-next-cursor"],
     maxAge: 600,
   });
   await app.register(swagger, {

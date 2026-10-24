@@ -19,19 +19,35 @@ export interface ObjectHead {
 
 /** Storage adapter. Local dev uses SeaweedFS; any S3-compatible service works unchanged. */
 export interface ObjectStore {
-  presignPut(key: string, contentType: string, ttlSeconds: number): Promise<string>;
+  /**
+   * The URL only accepts exactly `bytes` bytes of `contentType` whose SHA-256 is `sha256Hex`; the
+   * client must send the `x-amz-checksum-sha256` header (base64, see `checksumHeader`).
+   */
+  presignPut(
+    key: string,
+    contentType: string,
+    bytes: number,
+    sha256Hex: string,
+    ttlSeconds: number,
+  ): Promise<string>;
   presignGet(key: string, ttlSeconds: number, downloadName?: string): Promise<string>;
   head(key: string): Promise<ObjectHead | null>;
   /** First `length` bytes, used for magic-byte sniffing without downloading the object. */
   readPrefix(key: string, length: number): Promise<Uint8Array>;
   /** Streams the whole object once and returns its SHA-256. */
   sha256(key: string): Promise<string>;
+  /** SHA-256 (hex) the store verified while receiving the object, or null if it kept none. */
+  storedSha256(key: string): Promise<string | null>;
   put(key: string, body: Uint8Array | string, contentType: string): Promise<void>;
   get(key: string): Promise<Uint8Array>;
   delete(key: string): Promise<void>;
   list(prefix: string): Promise<{ key: string; bytes: number; lastModified: Date }[]>;
   ping(): Promise<void>;
 }
+
+/** Value of the `x-amz-checksum-sha256` header for a hex SHA-256. */
+export const checksumHeader = (sha256Hex: string) =>
+  Buffer.from(sha256Hex, "hex").toString("base64");
 
 export class S3Store implements ObjectStore {
   private readonly client: S3Client;
@@ -85,11 +101,31 @@ export class S3Store implements ObjectStore {
     }
   }
 
-  presignPut(key: string, contentType: string, ttlSeconds: number) {
+  presignPut(
+    key: string,
+    contentType: string,
+    bytes: number,
+    sha256Hex: string,
+    ttlSeconds: number,
+  ) {
+    // content-length is signed: the client sends the real body length, so a larger or smaller
+    // upload fails the signature check and never reaches the bucket. The digest is signed as a
+    // header (not hoisted into the query string) and the store checks it against the bytes it
+    // receives, answering 400 BadDigest on a mismatch.
     return getSignedUrl(
       this.presigner,
-      new PutObjectCommand({ Bucket: this.bucket, Key: key, ContentType: contentType }),
-      { expiresIn: ttlSeconds, signableHeaders: new Set(["content-type"]) },
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        ContentType: contentType,
+        ContentLength: bytes,
+        ChecksumSHA256: checksumHeader(sha256Hex),
+      }),
+      {
+        expiresIn: ttlSeconds,
+        signableHeaders: new Set(["content-type", "content-length", "x-amz-checksum-sha256"]),
+        unhoistableHeaders: new Set(["x-amz-checksum-sha256"]),
+      },
     );
   }
 
@@ -137,6 +173,15 @@ export class S3Store implements ObjectStore {
     return h.digest("hex");
   }
 
+  async storedSha256(key: string): Promise<string | null> {
+    const r = await this.client.send(
+      new HeadObjectCommand({ Bucket: this.bucket, Key: key, ChecksumMode: "ENABLED" }),
+    );
+    // A multipart object reports a checksum of checksums ("...-N"); that is not the file's digest.
+    if (!r.ChecksumSHA256 || r.ChecksumSHA256.includes("-")) return null;
+    return Buffer.from(r.ChecksumSHA256, "base64").toString("hex");
+  }
+
   async put(key: string, body: Uint8Array | string, contentType: string) {
     await this.client.send(
       new PutObjectCommand({ Bucket: this.bucket, Key: key, Body: body, ContentType: contentType }),
@@ -178,8 +223,10 @@ export class S3Store implements ObjectStore {
 /** In-memory store for tests. Presigned URLs are opaque tokens; tests PUT bytes via `putBytes`. */
 export class MemoryStore implements ObjectStore {
   readonly objects = new Map<string, { body: Uint8Array; contentType: string; at: Date }>();
+  /** Digests a real store would have verified at upload; tests set these to exercise that path. */
+  readonly storedChecksums = new Map<string, string>();
 
-  async presignPut(key: string, _ct: string, ttl: number) {
+  async presignPut(key: string, _ct: string, _bytes: number, _sha: string, ttl: number) {
     return `memory://put/${encodeURIComponent(key)}?ttl=${ttl}`;
   }
   async presignGet(key: string, ttl: number) {
@@ -200,6 +247,9 @@ export class MemoryStore implements ObjectStore {
     return createHash("sha256")
       .update(this.objects.get(key)?.body ?? new Uint8Array())
       .digest("hex");
+  }
+  async storedSha256(key: string) {
+    return this.storedChecksums.get(key) ?? null;
   }
   async put(key: string, body: Uint8Array | string, contentType: string) {
     this.objects.set(key, {

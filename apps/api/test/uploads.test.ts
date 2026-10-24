@@ -1,5 +1,5 @@
 import { keys } from "@parallaxops/contracts";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { api, type Harness, harness, jpeg, newTenant, seedDataset, sha } from "./helpers.ts";
 
 let h: Harness;
@@ -36,6 +36,8 @@ describe("upload requests", () => {
     );
     expect(decodeURIComponent(u.url)).not.toContain("passwd");
     expect(u.headers["content-type"]).toBe("image/jpeg");
+    // The store verifies this digest while receiving the bytes (base64 of the declared SHA-256).
+    expect(u.headers["x-amz-checksum-sha256"]).toBe(Buffer.from(sha(b), "hex").toString("base64"));
   });
 
   it.each([
@@ -103,6 +105,29 @@ describe("upload completion checks", () => {
     const r = await c.post(`/v1/datasets/${d.id}/uploads/complete`, { imageIds: [id] });
     expect(r.body.images[0].status).toBe("UPLOADED");
     expect((await c.get(`/v1/datasets/${d.id}`)).body.imageCount).toBe(1);
+  });
+
+  it("trusts the digest the store verified at upload instead of re-reading the object", async () => {
+    const t = newTenant();
+    const b = jpeg(15);
+    const { c, d, id, key } = await pending(t, b);
+    h.store.putBytes(key, b);
+    h.store.storedChecksums.set(key, sha(b));
+    const reread = vi.spyOn(h.store, "sha256").mockRejectedValue(new Error("must not re-read"));
+    const r = await c.post(`/v1/datasets/${d.id}/uploads/complete`, { imageIds: [id] });
+    reread.mockRestore();
+    expect(r.body.images[0].status).toBe("UPLOADED");
+  });
+
+  it("rejects an object whose stored digest differs from the declared one", async () => {
+    const t = newTenant();
+    const b = jpeg(16);
+    const { c, d, id, key } = await pending(t, b);
+    h.store.putBytes(key, b);
+    h.store.storedChecksums.set(key, sha(jpeg(17)));
+    const r = await c.post(`/v1/datasets/${d.id}/uploads/complete`, { imageIds: [id] });
+    expect(r.body.images[0].status).toBe("REJECTED");
+    expect(r.body.images[0].rejectReason).toMatch(/^checksum_mismatch/);
   });
 
   it("keeps the image PENDING when the object has not arrived yet", async () => {

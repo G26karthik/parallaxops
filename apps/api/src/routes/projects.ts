@@ -28,7 +28,11 @@ import type { Ctx } from "../context.ts";
 import { schema } from "../db/client.ts";
 import { AppError, conflict, notFound } from "../errors.ts";
 import { audit } from "../services/jobs.ts";
+import { afterCursor, cutPage, newestFirst, PageQuery } from "../services/paging.ts";
+import { checksumHeader } from "../services/storage.ts";
 
+/** Page size when the caller names none: large enough that the web app shows everything it has. */
+const DEFAULT_PAGE = 200;
 const { projects, datasets, images, jobs, tenants } = schema;
 const IdParam = <K extends string>(name: K) =>
   z.object({ [name]: z.uuid() } as Record<K, z.ZodUUID>);
@@ -104,14 +108,23 @@ export function projectRoutes(app: FastifyInstance, ctx: Ctx) {
 
   r.get(
     "/v1/projects",
-    { schema: { ...tag, response: { 200: z.array(ProjectSchema) } } },
-    async (req) => {
+    { schema: { ...tag, querystring: PageQuery, response: { 200: z.array(ProjectSchema) } } },
+    async (req, reply) => {
+      const limit = req.query.limit ?? DEFAULT_PAGE;
       const rows = await ctx.db
         .select()
         .from(projects)
-        .where(eq(projects.tenantId, req.tenantId))
-        .orderBy(desc(projects.createdAt));
-      return rows.map((p) => ({
+        .where(
+          and(
+            eq(projects.tenantId, req.tenantId),
+            afterCursor(projects.createdAt, projects.id, req.query.cursor),
+          ),
+        )
+        .orderBy(...newestFirst(projects.createdAt, projects.id))
+        .limit(limit + 1);
+      const { items, next } = cutPage(rows, limit);
+      if (next) reply.header("x-next-cursor", next);
+      return items.map((p) => ({
         id: p.id,
         name: p.name,
         description: p.description,
@@ -172,18 +185,27 @@ export function projectRoutes(app: FastifyInstance, ctx: Ctx) {
       schema: {
         tags: ["datasets"],
         params: IdParam("projectId"),
+        querystring: PageQuery,
         response: { 200: z.array(DatasetSchema) },
       },
     },
-    async (req) => {
+    async (req, reply) => {
+      const limit = req.query.limit ?? DEFAULT_PAGE;
       const rows = await ctx.db
         .select()
         .from(datasets)
         .where(
-          and(eq(datasets.projectId, req.params.projectId), eq(datasets.tenantId, req.tenantId)),
+          and(
+            eq(datasets.projectId, req.params.projectId),
+            eq(datasets.tenantId, req.tenantId),
+            afterCursor(datasets.createdAt, datasets.id, req.query.cursor),
+          ),
         )
-        .orderBy(desc(datasets.createdAt));
-      return Promise.all(rows.map((d) => datasetView(ctx, d)));
+        .orderBy(...newestFirst(datasets.createdAt, datasets.id))
+        .limit(limit + 1);
+      const { items, next } = cutPage(rows, limit);
+      if (next) reply.header("x-next-cursor", next);
+      return Promise.all(items.map((d) => datasetView(ctx, d)));
     },
   );
 
@@ -348,8 +370,17 @@ export function projectRoutes(app: FastifyInstance, ctx: Ctx) {
                   filename: p.filename,
                   sha256: p.f.sha256,
                   action: "UPLOAD" as const,
-                  url: await ctx.store.presignPut(p.key, p.f.contentType, LIMITS.presignTtlSeconds),
-                  headers: { "content-type": p.f.contentType },
+                  url: await ctx.store.presignPut(
+                    p.key,
+                    p.f.contentType,
+                    p.f.sizeBytes,
+                    p.f.sha256,
+                    LIMITS.presignTtlSeconds,
+                  ),
+                  headers: {
+                    "content-type": p.f.contentType,
+                    "x-amz-checksum-sha256": checksumHeader(p.f.sha256),
+                  },
                   expiresAt: iso(expires),
                 }
               : {
@@ -412,7 +443,12 @@ export function projectRoutes(app: FastifyInstance, ctx: Ctx) {
           const prefix = await ctx.store.readPrefix(img.objectKey, magic.length);
           if (!magic.every((b, i) => prefix[i] === b))
             await reject(`bad_magic: content is not ${img.contentType}`);
-          else if ((await ctx.store.sha256(img.objectKey)) !== img.sha256)
+          // The store checked the signed digest while receiving the bytes; only a store that kept
+          // none (or an object from before this was signed) is hashed again by streaming it.
+          else if (
+            ((await ctx.store.storedSha256(img.objectKey)) ??
+              (await ctx.store.sha256(img.objectKey))) !== img.sha256
+          )
             await reject("checksum_mismatch: uploaded bytes differ from the declared SHA-256");
           else {
             const [u] = await ctx.db
