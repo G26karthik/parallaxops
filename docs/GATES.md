@@ -82,12 +82,26 @@ the overhead hypothesis H2 was supported. API load (`api_load.json`): closed-loo
 and without a reconstruction running, no errors at 1, 8 and 32 virtual users; this is not
 reconstruction throughput.
 
-## Gate 5: depth (partly done)
+## Gate 5: depth (in progress)
 
 - Done: dense MVS through the COLMAP 4.2.1 CUDA binary as an optional stage with a typed fallback.
   Platform run (`benchmarks/results/gate5/dense_job.json`): dense stage 343.9 s, 249,005 points, 678 MiB
   GPU memory; the job completed in 389.7 s. A standalone probe took longer (773 s) for a similar
   cloud; the 2x spread is unexplained. Viewer toggle and screenshots: `docs/assets/ui/09-dense-viewer.png`,
   `10-dense-job.png`. Test: `tests/e2e/test_dense.py`.
-- Not done: dynamic-object masking comparison; a true multi-resolution viewer (the viewer decimates to
-  200k/300k points).
+- Multi-resolution viewer (done, sparse cloud verified live): the worker writes every point in a
+  coarse-to-fine PXLD file and the viewer streams it, draws a coarse prefix while the camera moves
+  and the full cloud once it stops (`docs/ARCHITECTURE.md`, "Point-cloud streaming"). Tested by
+  encoder property tests, a golden file shared by the Python encoder and the TypeScript decoder,
+  decoder tests, and the browser journey (`tests/e2e/test_ui.py` asserts levels, load completion and
+  that every point arrived). **Not yet re-run:** the dense GPU job through the new format
+  (`tests/e2e/test_dense.py` is updated but unexecuted), so there are no measured numbers for a
+  249k-point cloud in the new viewer yet. This is WebGL multi-resolution streaming, not WebGPU.
+- Dynamic-object masking (tooling and plan done, experiment not run): the pipeline takes per-image
+  masks (`--masks`), a test shows COLMAP honours them, and `docs/EXPERIMENT_MASKING.md` was written
+  before any run. There are no masked-versus-unmasked results yet, so nothing is claimed about
+  whether masking helps.
+- Found while verifying: the audit hardening (Gate 3 section) had broken phase transitions for real
+  jobs (every job stayed in PREPROCESSING). Unit tests and CI did not catch it because they drove
+  phases with a different event type than the worker sends; the live end-to-end tests did, and the
+  fix has a test on both sides of the contract (commit `bd011f9`).
