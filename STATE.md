@@ -14,6 +14,7 @@ Resumable status file. Updated after every step. Newest first.
 - `venv/` Python 3.14.2; `tools/`: node 26.12.1, pnpm 12.15.0, postgres 18.6, seaweedfs 4.49, temporal CLI 1.9.1, actionlint 1.7.12, playwright chromium, colmap-cuda 4.2.1
 - Stack: `scripts\dev.ps1 up|down|status|logs` (postgres :5433, s3 :8333, temporal :7233, api :4000, worker :9108, web :3000). Browser extension NOT connected: use Playwright (tests/e2e/test_ui.py).
 - Don't kill processes you didn't start; `dev.ps1` uses PID files in `run/`.
+- `check.py` runs `next build`, which breaks a running `next start`: `dev.ps1 restart web` afterwards (docs/CI.md). `dev.ps1 restart api` after API changes (node does not hot reload).
 
 ## Gates
 | Gate | Status |
@@ -27,13 +28,9 @@ Resumable status file. Updated after every step. Newest first.
 
 ## Ponytail audit (whole repo) — applied
 Fixed: job creation atomicity + per-tenant lock, upload race (per-dataset lock), heartbeats no longer stored, N+1 in job lists, dead limits/column/exports/Makefile, doc drift, Python<->TS contract-sync test, engine-failure unit tests.
-External review (docs/REVIEW.md) fixed: tenant-id fallback, production refusal of default S3 keys, check.py no longer skips TS steps without pnpm, worker/API event replay test. The rest of its findings are in the backlog there.
+External review (docs/REVIEW.md) fixed: tenant-id fallback, production refusal of default S3 keys, check.py no longer skips TS steps without pnpm, worker/API event replay test, signed upload size and digest (SeaweedFS verifies it; `complete` no longer re-reads), cursor paging, lease-guarded janitor/reconciler, QC warning for shuffled filenames. The rest is the backlog there.
 Reported, NOT done (decide before doing):
-- Presigned PUT signs content-type only, not content-length; `complete` re-downloads every byte through the API to hash (needs a SeaweedFS check for signed content-length / x-amz-checksum-sha256).
-- Run lists stop at 50 with no cursor; project list unpaged.
-- Reconciler and janitor timers run in every API process (not verified under concurrent replicas).
-- No test starts the Temporal workflow with an unknown contract version (docs/VERSIONING.md claims it fails the job).
-- Matching switches to sequential above 60 images and assumes names are in capture order; no QC warning yet.
+- No CI job runs the live stack; no fleet-wide GPU lease; Docker Compose never run.
 - `pipeline.reconstruct` is still ~250 lines (engine-result reading was extracted and tested).
 
 ## Next steps (ordered)

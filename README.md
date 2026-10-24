@@ -161,10 +161,10 @@ curl -s localhost:4000/readyz                    # database, object store, workf
 
 | Suite | Count | What it needs |
 |-------|------:|---------------|
-| Python unit (QC, supervisor, controller, scratch sweeper, worker, worker event stream, engine failure mapping, contract sync, dense wrapper, ground truth, masks, point-cloud encoder) | 79 | nothing |
-| Python integration (real COLMAP on ETH3D) | 2 | the downloaded scene |
-| TypeScript (state machine, contracts, API on in-process Postgres incl. concurrency races and a replay of the worker's recorded events, web libs and point-cloud decoder) | 80 | nothing |
-| End-to-end against the live stack (API, browser incl. axe accessibility, failure injection, races, presigned URLs, dense GPU) | 19 | `dev.ps1 up`, dataset, GPU for one |
+| Python unit (QC and capture-order check, supervisor, controller, scratch sweeper, worker, worker event stream, engine failure mapping, contract sync, dense wrapper, ground truth, masks, point-cloud encoder) | 83 | nothing |
+| Python integration (real COLMAP on ETH3D; the workflow on a throwaway Temporal server) | 5 | the downloaded scene; the Temporal CLI |
+| TypeScript (state machine, contracts, API on in-process Postgres incl. concurrency races, paging, leases, signed uploads and a replay of the worker's recorded events, web libs and point-cloud decoder) | 90 | nothing |
+| End-to-end against the live stack (API, browser incl. axe accessibility, failure injection, races, presigned URLs, dense GPU) | 21 | `dev.ps1 up`, dataset, GPU for one |
 
 CI runs `python scripts/check.py`: workflow validation (actionlint), ruff, mypy for three operating
 systems, pytest, Biome, `tsc`, vitest and a production web build. The same script is the local
@@ -207,8 +207,8 @@ pre-push hook, so a red run should not reach GitHub ([CI](docs/CI.md)).
 2. Masking on a harder sequence (`walking_halfsphere`), with motion-aware masks.
 3. A distributed capacity lease (Postgres row with heartbeat expiry) and a tested multi-worker run.
 4. Verify the Compose path, then Kubernetes manifests.
-5. Hardening backlog from the external review: signed upload sizes, paged lists, a single janitor
-   across replicas, a CI job that runs the live stack ([REVIEW](docs/REVIEW.md)).
+5. Backlog from the external review ([REVIEW](docs/REVIEW.md)): a CI job that runs the live stack,
+   web paging, a fleet-wide GPU lease.
 
 ## License
 

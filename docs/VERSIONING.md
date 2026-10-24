@@ -31,5 +31,8 @@ The API and the worker deploy independently, so every boundary carries a version
 2. Deploy the API that starts emitting the new major.
 3. Retire the old major in the worker in a later release.
 
-Tests: `tests/test_worker.py` (contract and manifest guards), `apps/api/test/openapi.test.ts`
+Tests: `tests/test_workflow_skew.py` (the real workflow on a throwaway Temporal dev server: an unknown
+contract fails the job without running the engine, and completed and failed runs are reported with
+their summary; needs the Temporal CLI, so it does not run in CI),
+`tests/test_worker.py` (contract and manifest guards), `apps/api/test/openapi.test.ts`
 (spec drift), `packages/contracts/test` (state machine and limits).

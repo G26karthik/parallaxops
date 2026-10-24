@@ -17,19 +17,21 @@ orders: each point was checked against the code first.
 | Multi-host scaling is a design: one heavy slot per worker, no global GPU lease | Accepted, documented | Already stated in `docs/ARCHITECTURE.md` and README. Not built: a distributed lease and a multi-worker run. |
 | Docs were stale against the head commit | **Fixed** | Gate evidence, test counts, dense numbers and image captions were rewritten from current code and measured runs. |
 | PXLD "keeps every point" is qualified by the 8 M encoder cap and the 3 M viewer budget | **Fixed (wording)** | `docs/ARCHITECTURE.md`, `docs/GATES.md` and README state the limits. |
-| Presigned PUT does not sign the content length, and `complete` re-reads whole objects | Deferred | Needs a signed size on upload and a streamed checksum. Today `complete` rejects an object whose stored size differs from the declared size, but only after the bytes are stored, so an oversized PUT still lands in the bucket until cleanup. |
-| List endpoints are not paged | Deferred | Cursor pagination on projects, datasets, jobs. |
-| Janitor and reconciler timers run in every API replica | Deferred | Not verified under concurrent replicas; the fix is a single owner (advisory lock or one scheduler). |
+| Presigned PUT does not sign the content length, and `complete` re-reads whole objects | **Fixed** | The URL now signs the declared size and the SHA-256 (`x-amz-checksum-sha256`). Checked against the real SeaweedFS in `tests/e2e/test_presign.py`: a PUT one byte larger or smaller gets 403, same size with different bytes gets 400 `BadDigest`, a dropped digest header gets 403. SeaweedFS keeps the verified digest, so `complete` reads it with a `HEAD` instead of streaming every object back through the API; a store that keeps none falls back to the old re-read. Unit tests: `apps/api/test/storage.test.ts`, `uploads.test.ts`. |
+| List endpoints are not paged | **Fixed** | Projects, datasets and jobs take `limit` (1 to 200) and `cursor`; the next cursor comes back in the `x-next-cursor` header, so the response bodies did not change. Default 200 for projects and datasets, 50 for jobs. Newest first with the id as tie-break, no gaps or repeats, tenant-scoped (`apps/api/test/paging.test.ts`). The web app does not page yet and shows the newest 200 projects. |
+| Janitor and reconciler timers run in every API replica | **Fixed** | Each timer first takes a lease row in Postgres (`maintenance_leases`, one atomic upsert); only the holder does the work, and another replica takes over when the lease expires (`apps/api/test/lease.test.ts`). Tested with two simulated holders on one database, not with two real API processes. |
+| Shuffled filenames silently break sequential matching above 60 images (found in our own audit) | **Fixed** | QC compares how alike name-adjacent images are with how alike random pairs are, and warns when the ratio is above 0.9. Calibrated on two real sets (ordered 0.54 and 0.83, the same sets shuffled 0.93 to 1.08); only two sets, so the threshold is a measured guess, not a proof. `services/vision-worker/tests/test_capture_order.py`. |
+| No test starts the Temporal workflow with an unknown contract version (found in our own audit) | **Fixed** | `services/vision-worker/tests/test_workflow_skew.py` runs the real workflow on a throwaway dev server with stub activities. Mutation-checked: disabling the guard fails it. It also pins the `completed` and `failed` bodies the workflow sends. Needs the Temporal CLI, so it is skipped in CI. |
 | Docker Compose files never executed | Deferred, stated | Listed under "Not verified" in `docs/GATES.md`. |
 | Observability and benchmark coverage are limited | Accepted | Two ETH3D variants of one scene and one TUM sequence; stated in README "Limitations". |
 | Dataset license diligence (ETH3D, TUM) | Documented | ETH3D and TUM are both marked unconfirmed in `docs/DATASETS.md` (TUM section added); no TUM imagery is committed. |
 
 ## Backlog from this review
 
-1. Sign the upload size in presigned PUTs and verify the checksum while streaming.
-2. Cursor pagination for list endpoints.
-3. One owner for the janitor and reconciler across replicas.
-4. A CI job that runs the live stack (Postgres, object store, Temporal, worker) for the e2e suite.
-5. A fleet-wide heavy-job lease.
-6. Run the Docker Compose path once and record the result.
-7. A Prometheus scrape test and more benchmark scenes.
+1. A CI job that runs the live stack (Postgres, object store, Temporal, worker) for the e2e suite.
+   The workflow-level tests (`test_workflow_skew.py`) and the live e2e suite need local tools, so
+   CI still cannot see them.
+2. A fleet-wide heavy-job lease (the new `maintenance_leases` table is the pattern to follow).
+3. Run the Docker Compose path once and record the result.
+4. Paging in the web app, and a real two-process test of the lease.
+5. A Prometheus scrape test and more benchmark scenes.
