@@ -82,21 +82,26 @@ the overhead hypothesis H2 was supported. API load (`api_load.json`): closed-loo
 and without a reconstruction running, no errors at 1, 8 and 32 virtual users; this is not
 reconstruction throughput.
 
-## Gate 5: depth (in progress)
+## Gate 5: depth (done)
 
 - Done: dense MVS through the COLMAP 4.2.1 CUDA binary as an optional stage with a typed fallback.
-  Platform run (`benchmarks/results/gate5/dense_job.json`): dense stage 343.9 s, 249,005 points, 678 MiB
-  GPU memory; the job completed in 389.7 s. A standalone probe took longer (773 s) for a similar
-  cloud; the 2x spread is unexplained. Viewer toggle and screenshots: `docs/assets/ui/09-dense-viewer.png`,
-  `10-dense-job.png`. Test: `tests/e2e/test_dense.py`.
-- Multi-resolution viewer (done, sparse cloud verified live): the worker writes every point in a
-  coarse-to-fine PXLD file and the viewer streams it, draws a coarse prefix while the camera moves
-  and the full cloud once it stops (`docs/ARCHITECTURE.md`, "Point-cloud streaming"). Tested by
-  encoder property tests, a golden file shared by the Python encoder and the TypeScript decoder,
-  decoder tests, and the browser journey (`tests/e2e/test_ui.py` asserts levels, load completion and
-  that every point arrived). **Not yet re-run:** the dense GPU job through the new format
-  (`tests/e2e/test_dense.py` is updated but unexecuted), so there are no measured numbers for a
-  249k-point cloud in the new viewer yet. This is WebGL multi-resolution streaming, not WebGPU.
+  Latest platform run (`benchmarks/results/gate5/dense_job.json`, through the PXLD browser format):
+  dense stage 355.3 s, 248,468 points, completed in 413 s. The earlier run was 343.9 s and 249,005
+  points; a standalone probe took longer (773 s) for a similar cloud and the 2x spread is
+  unexplained (`docs/PERFORMANCE.md`). Viewer toggle and screenshots:
+  `docs/assets/ui/09-dense-viewer.png`, `10-dense-job.png`. Test: `tests/e2e/test_dense.py`.
+- Multi-resolution viewer (done, verified live on sparse and dense clouds): the worker writes every
+  point in a coarse-to-fine PXLD file and the viewer streams it, draws a coarse prefix while the
+  camera moves and the full cloud once it stops (`docs/ARCHITECTURE.md`, "Point-cloud streaming").
+  Tested by encoder property tests, a golden file shared by the Python encoder and the TypeScript
+  decoder, decoder tests, the browser journey (`tests/e2e/test_ui.py` asserts levels, load
+  completion and that every point arrived) and the real GPU job (`tests/e2e/test_dense.py` checks
+  the file header and size against the job's point count). Measured on the 248,468-point cloud in
+  headless Chromium with software WebGL: first level at 106 ms, all points at 147 ms, 125,496
+  points drawn while orbiting and all 248,468 at rest (`benchmarks/results/gate5/viewer_lod.json`).
+  This is WebGL multi-resolution streaming, not WebGPU. "Every point" holds up to the encoder cap
+  of 8,000,000 points per file and the viewer budget of 3,000,000 points drawn; beyond those the
+  finest points are dropped.
 - Dynamic-object masking (done, honest null result): the pipeline takes per-image masks
   (`--masks`), a test shows COLMAP honours them, and the plan in `docs/EXPERIMENT_MASKING.md` was
   committed before any masked run. On TUM `walking_xyz` (86 frames, real people, motion-capture

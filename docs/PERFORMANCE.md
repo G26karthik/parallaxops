@@ -26,18 +26,41 @@ Peak process-tree RSS 3.8 GiB. Submit-to-202 latency: **46 ms**.
 ## Dense reconstruction (GPU, opt-in)
 
 COLMAP 4.2.1 CUDA build, same terrace scene (23 images), dense working size 1000 px, geometric
-consistency on. Two measured runs:
+consistency on. Three measured runs:
 
 | Run | Dense stage | Points | GPU memory in use (peak) | Evidence |
 |-----|------------:|-------:|-------------------------:|----------|
-| Through the platform (job with `dense: true`) | 344 s (PatchMatch 340 s, fusion 3 s) | 249,005 (249,005 in the browser preview, decimation cap is 300k) | 678 MiB | `benchmarks/results/gate5/dense_job.json` |
+| Through the platform, latest (job with `dense: true`, 413 s submit to completed) | 355 s (PatchMatch 350 s, fusion 4.8 s) | 248,468, all of them in the browser file | 1,650 MiB | `benchmarks/results/gate5/dense_job.json` |
+| Through the platform, earlier (before the streamed browser format) | 344 s (PatchMatch 340 s, fusion 3 s) | 249,005 | 678 MiB | the same file at an earlier commit (git history) |
 | Standalone probe before integration | 773 s | 253,904 | 1,545 MiB | measured by hand, not committed |
 
-The two runs differ by 2.2x in time and in memory with the same inputs and settings. The cause was
-not investigated; a plausible factor is laptop GPU power and thermal state, and the "memory in use"
-figure includes other processes on the GPU (desktop, browser). Treat the dense numbers as a range.
-Peak GPU memory stayed far below the 8 GiB budget; the one-heavy-job-at-a-time rule means dense never
-runs alongside another GPU job.
+The two platform runs agree on time within 3%. The standalone probe was 2.2x slower with the same
+inputs and settings, and the point count moves by about 0.2% between runs. The cause of the slow
+probe was not investigated; a plausible factor is laptop GPU power and thermal state, and the
+"memory in use" figure includes other processes on the GPU (desktop, browser), which is probably why
+it ranges from 678 to 1,650 MiB. Treat the dense numbers as a range. Peak GPU memory stayed far below
+the 8 GiB budget; the one-heavy-job-at-a-time rule means dense never runs alongside another GPU job.
+
+### Viewer, streamed multi-resolution cloud
+
+The 248,468-point dense cloud above, as a 3.98 MB PXLD file in 8 levels (171, 720, 2,420, 7,695,
+22,491, 57,516, 125,496, 248,468 points cumulative). Measured by `benchmarks/measure_viewer.py`
+(headless Chromium with software WebGL, against the local object store), so these numbers show
+decode and draw cost on this machine, not network speed or a real GPU:
+
+| Measure | Value |
+|---------|------:|
+| First level drawn | 106 ms |
+| All 248,468 points received | 147 ms |
+| Points drawn at rest | 248,468 |
+| Points drawn while the camera is moving | 125,496 (largest level within the 150,000 cap) |
+| Points drawn after the camera settles | 248,468 |
+| Time per orbit step, full detail / Level 3 (2,420 points) | 17.3 ms / 16.5 ms |
+
+The orbit step timing does not separate the two detail levels: under software rendering at this
+size it is dominated by input dispatch and the frame loop, so it is not evidence of a frame rate
+gain. What it does show is that the full cloud draws and orbits without stalling, and that the
+streaming and the coarse-while-moving logic behave as designed. Raw: `benchmarks/results/gate5/viewer_lod.json`.
 
 ## Control-plane API under bounded load
 

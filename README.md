@@ -57,7 +57,7 @@ one-command stack script is Windows-only today (a container path exists but is
 <table>
 <tr>
 <td width="50%"><img src="docs/assets/ui/06-viewer.png" alt="Interactive sparse point cloud viewer"><br><sub>Sparse SfM cloud and camera frusta from the 23-image terrace run.</sub></td>
-<td width="50%"><img src="docs/assets/ui/09-dense-viewer.png" alt="Dense multi-view-stereo point cloud of the same scene"><br><sub>Dense MVS cloud of the same scene (249k points, GPU, decimated for the browser).</sub></td>
+<td width="50%"><img src="docs/assets/ui/09-dense-viewer.png" alt="Dense multi-view-stereo point cloud of the same scene"><br><sub>Dense MVS cloud of the same scene (248k points, GPU, every point streamed to the browser).</sub></td>
 </tr>
 <tr>
 <td colspan="2"><img src="docs/assets/ui/08-job-failed-diagnostics.png" alt="A failed job with a typed diagnostic and what to do"><br><sub>A deliberately hopeless capture fails with a typed, actionable diagnostic.</sub></td>
@@ -73,7 +73,8 @@ come from files in [`benchmarks/results/`](benchmarks/results). Full tables, con
 | What | Result |
 |------|--------|
 | Reconstruction, ETH3D terrace, 23 DSLR images, 1600 px, CPU | 23/23 registered, 5.4k sparse points, 0.85 px mean reprojection, **camera position error 0.31% of rig spread vs ground truth**, 0.52 deg median rotation error, 87 s through the platform |
-| Dense reconstruction, same scene, GPU (opt-in) | **249k points** at 1000 px; dense stage 344 s through the platform (a standalone probe took 773 s; the 2x spread is unexplained, likely laptop GPU power state); **0.7 to 1.5 GiB** of the 8 GiB GPU memory in use; falls back to sparse with a typed warning when unavailable |
+| Dense reconstruction, same scene, GPU (opt-in) | **248k points** at 1000 px; dense stage 344 to 355 s through the platform in two runs (a standalone probe took 773 s; the 2x spread is unexplained, likely laptop GPU power state); **0.7 to 1.7 GiB** of the 8 GiB GPU memory in use; falls back to sparse with a typed warning when unavailable |
+| Browser viewer, 248k-point dense cloud (software WebGL) | first level drawn in 106 ms, all points in 147 ms; 125k points drawn while orbiting, all 248k once still |
 | Job submit to HTTP 202 | 46 ms |
 | API under load, 32 concurrent users, idle / during a reconstruction | p95 351 ms / 433 ms, 0 errors |
 | Second job while one runs | queued 90 s; never more than one heavy job active |
@@ -160,9 +161,9 @@ curl -s localhost:4000/readyz                    # database, object store, workf
 
 | Suite | Count | What it needs |
 |-------|------:|---------------|
-| Python unit (QC, supervisor, controller, scratch sweeper, worker, engine failure mapping, contract sync, dense wrapper, ground truth) | 69 | nothing |
+| Python unit (QC, supervisor, controller, scratch sweeper, worker, worker event stream, engine failure mapping, contract sync, dense wrapper, ground truth, masks, point-cloud encoder) | 79 | nothing |
 | Python integration (real COLMAP on ETH3D) | 2 | the downloaded scene |
-| TypeScript (state machine, contracts, API on in-process Postgres incl. concurrency races, web libs) | 68 | nothing |
+| TypeScript (state machine, contracts, API on in-process Postgres incl. concurrency races and a replay of the worker's recorded events, web libs and point-cloud decoder) | 80 | nothing |
 | End-to-end against the live stack (API, browser incl. axe accessibility, failure injection, races, presigned URLs, dense GPU) | 19 | `dev.ps1 up`, dataset, GPU for one |
 
 CI runs `python scripts/check.py`: workflow validation (actionlint), ruff, mypy for three operating
@@ -174,7 +175,8 @@ pre-push hook, so a red run should not reach GitHub ([CI](docs/CI.md)).
 [Architecture](docs/ARCHITECTURE.md) · [ADRs](docs/adr) · [Environment audit](docs/ENVIRONMENT.md) ·
 [Datasets and licensing](docs/DATASETS.md) · [Performance](docs/PERFORMANCE.md) ·
 [Experiments](docs/EXPERIMENTS.md) · [Security](docs/SECURITY.md) · [Operations](docs/OPERATIONS.md) ·
-[Versioning](docs/VERSIONING.md) · [Gate evidence](docs/GATES.md) · [Infrastructure](infra/README.md)
+[Versioning](docs/VERSIONING.md) · [Gate evidence](docs/GATES.md) · [External review](docs/REVIEW.md) ·
+[Infrastructure](infra/README.md)
 
 ## Limitations
 
@@ -184,8 +186,13 @@ pre-push hook, so a red run should not reach GitHub ([CI](docs/CI.md)).
   supplies a scale.
 - QC flags (blur, exposure, duplicates) are heuristics and do not prove reconstructability.
 - Evaluated on **two scenes**, mostly one, with synthetic degradations. Nothing generalises yet.
-- The controller (v1) is **not recommended**; see the experiment. Dynamic-object masking was not
-  attempted.
+- The controller (v1) is **not recommended**; see the experiment. It is experimental and not wired
+  into the platform: only the benchmarks use it, jobs always run the fixed baseline configuration.
+- Dynamic-object masking was tried once: on TUM `walking_xyz` it made no measurable difference to
+  camera accuracy ([EXPERIMENT_MASKING](docs/EXPERIMENT_MASKING.md)). One sequence, baseline already
+  at the ceiling, so it neither proves nor rules out a benefit on harder scenes.
+- The browser file holds every point up to 8 million per cloud, and the viewer draws at most 3
+  million; beyond that the finest points are dropped (PXLD, [ARCHITECTURE](docs/ARCHITECTURE.md)).
 - One heavy job per **worker process**; there is no fleet-wide GPU lease, no multi-host test, no
   Kubernetes manifests, and the container path is unverified. Scale-out is a design, not a claim.
 - No login system by design. Tenant ids are not secrets (ADR 0004).
@@ -197,10 +204,11 @@ pre-push hook, so a red run should not reach GitHub ([CI](docs/CI.md)).
 
 1. Controller v2 with an independent consistency check and re-run-to-agree acceptance, pre-registered
    and evaluated on more scenes.
-2. Dynamic-object masking comparison (oracle masks first, then a segmentation model).
+2. Masking on a harder sequence (`walking_halfsphere`), with motion-aware masks.
 3. A distributed capacity lease (Postgres row with heartbeat expiry) and a tested multi-worker run.
 4. Verify the Compose path, then Kubernetes manifests.
-5. Multi-resolution (octree) streaming for large dense clouds.
+5. Hardening backlog from the external review: signed upload sizes, paged lists, a single janitor
+   across replicas, a CI job that runs the live stack ([REVIEW](docs/REVIEW.md)).
 
 ## License
 

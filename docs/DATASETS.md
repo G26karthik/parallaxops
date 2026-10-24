@@ -32,6 +32,17 @@ Images are decoded, EXIF-orientation-normalised and resized so the longest side 
 The ground-truth `images.txt` is used **only** by the evaluator (`vision reconstruct --ground-truth`)
 and is never given to the reconstruction.
 
+## TUM RGB-D, sequence `freiburg3_walking_xyz` (masking experiment only)
+
+Downloaded by hand from the TUM Computer Vision Group host (source URL in
+`docs/EXPERIMENT_MASKING.md`) for that experiment: 86 colour frames with motion-capture ground
+truth (Sturm et al., IROS 2012). **Its license was
+not confirmed** by this project, so the same rule as ETH3D applies: treat it as research-only,
+never commit or redistribute the imagery or masks derived from it, and replace it with your own
+capture before any commercial use. Only measurements are committed (`benchmarks/results/masking/`).
+The segmentation model (`facebook/detr-resnet-50-panoptic`) is Apache-2.0 according to its model
+card; the weights are downloaded at run time and not stored in the repository.
+
 ## Own captures
 
 Any folder of 15-60 overlapping JPG/PNG photos works. See the capture guide in the README.

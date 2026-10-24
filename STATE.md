@@ -23,28 +23,29 @@ Resumable status file. Updated after every step. Newest first.
 | G2 async vertical slice | done; evidence in docs/GATES.md; milestone closed |
 | G3 hardening | done (cancel, worker kill, API restart, races, presign tests); Docker Compose files UNVERIFIED; milestone closed |
 | G4 measurement | done; controller v1 did not meet H1 (honest write-up in docs/EXPERIMENTS.md); milestone closed |
-| G5 depth | in progress: dense MVS via COLMAP CUDA works; multi-resolution viewer built and verified live on a sparse job (dense not re-run); masking experiment DONE (null result: no accuracy change, segmentation cost 493 s, see docs/EXPERIMENT_MASKING.md) |
+| G5 depth | done: dense MVS via COLMAP CUDA; multi-resolution viewer verified live on sparse and dense jobs (dense job 413 s, 248,468 points, viewer numbers in docs/PERFORMANCE.md); masking experiment (null result: no accuracy change, segmentation cost 493 s, see docs/EXPERIMENT_MASKING.md) |
 
 ## Ponytail audit (whole repo) — applied
 Fixed: job creation atomicity + per-tenant lock, upload race (per-dataset lock), heartbeats no longer stored, N+1 in job lists, dead limits/column/exports/Makefile, doc drift, Python<->TS contract-sync test, engine-failure unit tests.
+External review (docs/REVIEW.md) fixed: tenant-id fallback, production refusal of default S3 keys, check.py no longer skips TS steps without pnpm, worker/API event replay test. The rest of its findings are in the backlog there.
 Reported, NOT done (decide before doing):
 - Presigned PUT signs content-type only, not content-length; `complete` re-downloads every byte through the API to hash (needs a SeaweedFS check for signed content-length / x-amz-checksum-sha256).
 - Run lists stop at 50 with no cursor; project list unpaged.
-- Reconciler and janitor timers run in every API process (safe to repeat, wasteful with replicas).
+- Reconciler and janitor timers run in every API process (not verified under concurrent replicas).
 - No test starts the Temporal workflow with an unknown contract version (docs/VERSIONING.md claims it fails the job).
 - Matching switches to sequential above 60 images and assumes names are in capture order; no QC warning yet.
 - `pipeline.reconstruct` is still ~250 lines (engine-result reading was extracted and tested).
 
 ## Next steps (ordered)
-CI green at f1051be. Milestones G2-G4 closed with evidence links; G5 stays open.
+CI green at f1051be; later commits are pushed only after `check.py` and the WSL replica pass.
 Regression found and fixed (bd011f9): the audit commits 0a082f7..2d98244 left real jobs stuck in
-PREPROCESSING (phase changes arrive as state-carrying heartbeats). CI cannot see this; run the live
-e2e (`tests/e2e/test_ui.py`) after any change to event handling.
-1. Masking experiment finished (results in docs/EXPERIMENT_MASKING.md). Optional follow-up: a harder
-   sequence (e.g. TUM walking_halfsphere) since walking_xyz left the baseline at the ceiling.
-2. Re-run `tests/e2e/test_dense.py` (GPU, about 7 minutes) and measure the viewer on the dense cloud.
-3. Audit items listed above that were reported but not done.
-3. Optional: Docker Compose verification (starting Docker Desktop allowed; stopping it is not), re-measure worker-kill recovery, terminal demo SVG, masking experiment, controller v2 (new pre-registered plan).
+PREPROCESSING (phase changes arrive as state-carrying heartbeats). CI cannot see live-stack
+regressions; `tests/e2e/test_ui.py` and `test_dense.py` do. Run them after any change to event
+handling. The recorded worker events are now also replayed through the API in unit tests.
+1. Optional: masking on a harder sequence (TUM walking_halfsphere), since walking_xyz left the
+   baseline at the ceiling.
+2. Audit items listed above that were reported but not done, and the backlog in docs/REVIEW.md.
+3. Optional: Docker Compose verification (starting Docker Desktop allowed; stopping it is not), re-measure worker-kill recovery, terminal demo SVG, controller v2 (new pre-registered plan).
 
 ## GitHub
 - https://github.com/G26karthik/parallaxops (public), milestones G0-G5 (G0-G4 closed, G5 open).

@@ -55,8 +55,10 @@ flowchart LR
 The worker writes each cloud as one multi-resolution file (`worker/lod.py`, decoded by
 `apps/web/src/lib/lod.ts`). Points are ordered coarse to fine: level k keeps, among the points not
 used yet, the one nearest each occupied cell of a 16, 32, ..., 1024 grid over the bounding cube, and
-the rest forms the last level. Levels are disjoint, so the file holds **every** point; nothing is
-decimated away. Every prefix that ends on a level boundary covers every region the full cloud
+the rest forms the last level. Levels are disjoint, so the file holds every point the encoder is
+given: levels only reorder, nothing is decimated. The encoder caps a file at 8 million points
+(`LOD_MAX_POINTS`, the finest points are cut) and the viewer draws at most 3 million, so "every
+point" holds below those limits. Every prefix that ends on a level boundary covers every region the full cloud
 covers (tested), so the viewer can:
 
 - draw level 0 after the first few kilobytes and refine while the download runs (plain `fetch`
