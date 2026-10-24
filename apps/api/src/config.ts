@@ -27,8 +27,17 @@ export type Config = z.infer<typeof Env> & { s3PublicEndpoint: string; corsOrigi
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const c = Env.parse(env);
-  if (c.NODE_ENV === "production" && c.INTERNAL_API_SECRET === "change-me-locally-please") {
-    throw new Error("INTERNAL_API_SECRET must be set in production");
+  if (c.NODE_ENV === "production") {
+    // Every development default that is a credential must be replaced before serving real traffic.
+    if (c.INTERNAL_API_SECRET === "change-me-locally-please") {
+      throw new Error("INTERNAL_API_SECRET must be set in production");
+    }
+    if (c.S3_ACCESS_KEY === "dev-access-key") {
+      throw new Error("S3_ACCESS_KEY must be set in production");
+    }
+    if (c.S3_SECRET_KEY === "dev-secret-key-change-me-locally") {
+      throw new Error("S3_SECRET_KEY must be set in production");
+    }
   }
   return {
     ...c,
