@@ -15,6 +15,13 @@
       "when": 1792797183432,
       "tag": "0001_drop_unused_max_active_jobs",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792823294173,
+      "tag": "0002_maintenance_leases",
+      "breakpoints": true
     }
   ]
 }

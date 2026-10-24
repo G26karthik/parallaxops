@@ -203,6 +203,13 @@ export const artifacts = pgTable(
   (t) => [unique("artifacts_job_attempt_kind").on(t.jobId, t.attemptNo, t.kind)],
 );
 
+/** One row per periodic task: which API replica runs it now, and until when (services/lease.ts). */
+export const maintenanceLeases = pgTable("maintenance_leases", {
+  name: text("name").primaryKey(),
+  holder: text("holder").notNull(),
+  expiresAt: ts("expires_at").notNull(),
+});
+
 export const auditLog = pgTable(
   "audit_log",
   {
