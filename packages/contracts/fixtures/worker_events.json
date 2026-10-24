@@ -1,0 +1,150 @@
+[
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 1,
+    "type": "attempt_started",
+    "workerId": "w-golden",
+    "payload": {},
+    "state": "PREPROCESSING"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 2,
+    "type": "stage_started",
+    "workerId": "w-golden",
+    "payload": {},
+    "stage": "download_inputs"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 3,
+    "type": "stage_finished",
+    "workerId": "w-golden",
+    "payload": {
+      "seconds": 0.2
+    },
+    "stage": "download_inputs"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 4,
+    "type": "heartbeat",
+    "workerId": "w-golden",
+    "payload": {},
+    "state": "PREPROCESSING"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 5,
+    "type": "stage_started",
+    "workerId": "w-golden",
+    "payload": {},
+    "stage": "qc"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 6,
+    "type": "stage_finished",
+    "workerId": "w-golden",
+    "payload": {
+      "seconds": 0.5
+    },
+    "stage": "qc"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 7,
+    "type": "heartbeat",
+    "workerId": "w-golden",
+    "payload": {},
+    "state": "RECONSTRUCTING"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 8,
+    "type": "stage_started",
+    "workerId": "w-golden",
+    "payload": {},
+    "stage": "feature_extraction"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 9,
+    "type": "heartbeat",
+    "workerId": "w-golden",
+    "payload": {
+      "rssBytes": 1000,
+      "diskBytes": 2000,
+      "elapsed": 7.0
+    }
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 10,
+    "type": "stage_finished",
+    "workerId": "w-golden",
+    "payload": {
+      "seconds": 6.5
+    },
+    "stage": "feature_extraction"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 11,
+    "type": "heartbeat",
+    "workerId": "w-golden",
+    "payload": {},
+    "state": "EVALUATING"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 12,
+    "type": "stage_started",
+    "workerId": "w-golden",
+    "payload": {},
+    "stage": "metrics"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 13,
+    "type": "stage_finished",
+    "workerId": "w-golden",
+    "payload": {
+      "seconds": 0.7
+    },
+    "stage": "metrics"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 14,
+    "type": "stage_started",
+    "workerId": "w-golden",
+    "payload": {},
+    "stage": "publish_artifacts"
+  },
+  {
+    "jobId": "00000000-0000-4000-8000-000000000001",
+    "attemptNo": 1,
+    "seq": 15,
+    "type": "stage_finished",
+    "workerId": "w-golden",
+    "payload": {
+      "seconds": 0.1
+    },
+    "stage": "publish_artifacts"
+  }
+]
