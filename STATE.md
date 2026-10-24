@@ -23,7 +23,7 @@ Resumable status file. Updated after every step. Newest first.
 | G2 async vertical slice | done; evidence in docs/GATES.md; milestone closed |
 | G3 hardening | done (cancel, worker kill, API restart, races, presign tests); Docker Compose files UNVERIFIED; milestone closed |
 | G4 measurement | done; controller v1 did not meet H1 (honest write-up in docs/EXPERIMENTS.md); milestone closed |
-| G5 depth | in progress: dense MVS via COLMAP CUDA works; multi-resolution viewer built and verified live on a sparse job (dense not re-run); masking tooling + pre-registered plan committed, experiment NOT run yet |
+| G5 depth | in progress: dense MVS via COLMAP CUDA works; multi-resolution viewer built and verified live on a sparse job (dense not re-run); masking experiment DONE (null result: no accuracy change, segmentation cost 493 s, see docs/EXPERIMENT_MASKING.md) |
 
 ## Ponytail audit (whole repo) — applied
 Fixed: job creation atomicity + per-tenant lock, upload race (per-dataset lock), heartbeats no longer stored, N+1 in job lists, dead limits/column/exports/Makefile, doc drift, Python<->TS contract-sync test, engine-failure unit tests.
@@ -40,10 +40,8 @@ CI green at f1051be. Milestones G2-G4 closed with evidence links; G5 stays open.
 Regression found and fixed (bd011f9): the audit commits 0a082f7..2d98244 left real jobs stuck in
 PREPROCESSING (phase changes arrive as state-carrying heartbeats). CI cannot see this; run the live
 e2e (`tests/e2e/test_ui.py`) after any change to event handling.
-1. Masking experiment (docs/EXPERIMENT_MASKING.md): `benchmarks/masking/run_masking.py prepare`
-   (needs the venv-mask environment, a few GB RAM, run it alone), then `run --reps 3`, `summarize`,
-   then add results to the plan doc. The previous attempt was killed by the system for low memory
-   before writing any masks. TUM walking_xyz is already in `$PARALLAXOPS_HOME/data/tum`.
+1. Masking experiment finished (results in docs/EXPERIMENT_MASKING.md). Optional follow-up: a harder
+   sequence (e.g. TUM walking_halfsphere) since walking_xyz left the baseline at the ceiling.
 2. Re-run `tests/e2e/test_dense.py` (GPU, about 7 minutes) and measure the viewer on the dense cloud.
 3. Audit items listed above that were reported but not done.
 3. Optional: Docker Compose verification (starting Docker Desktop allowed; stopping it is not), re-measure worker-kill recovery, terminal demo SVG, masking experiment, controller v2 (new pre-registered plan).

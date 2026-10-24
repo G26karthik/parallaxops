@@ -1,0 +1,26 @@
+{
+  "host": {
+    "os": "Windows 11 (10.0.26200)",
+    "machine": "AMD64",
+    "cpu_logical_cores": 16,
+    "cpu_physical_cores": 8,
+    "ram_total_gib": 31.2,
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "vram_mib": 8188,
+      "driver": "617.42"
+    }
+  },
+  "tools": {
+    "python": "3.14.2",
+    "pycolmap": "4.2.1",
+    "pycolmap_has_cuda": "False",
+    "open3d": "0.20.0",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4"
+  },
+  "plan": "docs/EXPERIMENT_MASKING.md",
+  "started": "2026-10-24T05:54:33.890696+00:00",
+  "segmentation_model": "facebook/detr-resnet-50-panoptic",
+  "segmentation_seconds": 493.23
+}

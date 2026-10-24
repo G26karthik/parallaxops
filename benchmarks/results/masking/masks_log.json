@@ -1,0 +1,359 @@
+{
+ "model": "facebook/detr-resnet-50-panoptic",
+ "model_commit": null,
+ "torch": "2.14.1+cpu",
+ "device": "cpu",
+ "classes": [
+  "person"
+ ],
+ "threshold": 0.85,
+ "dilate_px": 6,
+ "n_images": 86,
+ "total_seconds": 493.23,
+ "per_image": {
+  "f0001.png": {
+   "ignored_fraction": 0.33146,
+   "seconds": 9.16
+  },
+  "f0002.png": {
+   "ignored_fraction": 0.34144,
+   "seconds": 5.655
+  },
+  "f0003.png": {
+   "ignored_fraction": 0.41696,
+   "seconds": 5.767
+  },
+  "f0004.png": {
+   "ignored_fraction": 0.35597,
+   "seconds": 6.479
+  },
+  "f0005.png": {
+   "ignored_fraction": 0.33889,
+   "seconds": 6.402
+  },
+  "f0006.png": {
+   "ignored_fraction": 0.29562,
+   "seconds": 6.325
+  },
+  "f0007.png": {
+   "ignored_fraction": 0.35774,
+   "seconds": 6.41
+  },
+  "f0008.png": {
+   "ignored_fraction": 0.2826,
+   "seconds": 6.338
+  },
+  "f0009.png": {
+   "ignored_fraction": 0.28912,
+   "seconds": 6.128
+  },
+  "f0010.png": {
+   "ignored_fraction": 0.30411,
+   "seconds": 6.126
+  },
+  "f0011.png": {
+   "ignored_fraction": 0.29041,
+   "seconds": 6.528
+  },
+  "f0012.png": {
+   "ignored_fraction": 0.32382,
+   "seconds": 6.313
+  },
+  "f0013.png": {
+   "ignored_fraction": 0.27072,
+   "seconds": 6.249
+  },
+  "f0014.png": {
+   "ignored_fraction": 0.24677,
+   "seconds": 6.346
+  },
+  "f0015.png": {
+   "ignored_fraction": 0.21323,
+   "seconds": 6.342
+  },
+  "f0016.png": {
+   "ignored_fraction": 0.14676,
+   "seconds": 6.08
+  },
+  "f0017.png": {
+   "ignored_fraction": 0.18642,
+   "seconds": 6.02
+  },
+  "f0018.png": {
+   "ignored_fraction": 0.217,
+   "seconds": 6.209
+  },
+  "f0019.png": {
+   "ignored_fraction": 0.13005,
+   "seconds": 6.158
+  },
+  "f0020.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 6.037
+  },
+  "f0021.png": {
+   "ignored_fraction": 0.09948,
+   "seconds": 6.306
+  },
+  "f0022.png": {
+   "ignored_fraction": 0.13109,
+   "seconds": 6.194
+  },
+  "f0023.png": {
+   "ignored_fraction": 0.1164,
+   "seconds": 6.153
+  },
+  "f0024.png": {
+   "ignored_fraction": 0.11864,
+   "seconds": 6.187
+  },
+  "f0025.png": {
+   "ignored_fraction": 0.11819,
+   "seconds": 6.185
+  },
+  "f0026.png": {
+   "ignored_fraction": 0.03241,
+   "seconds": 6.27
+  },
+  "f0027.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 6.153
+  },
+  "f0028.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 5.261
+  },
+  "f0029.png": {
+   "ignored_fraction": 0.01481,
+   "seconds": 5.34
+  },
+  "f0030.png": {
+   "ignored_fraction": 0.01339,
+   "seconds": 5.657
+  },
+  "f0031.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 5.5
+  },
+  "f0032.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 6.15
+  },
+  "f0033.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 5.956
+  },
+  "f0034.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 5.664
+  },
+  "f0035.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 5.494
+  },
+  "f0036.png": {
+   "ignored_fraction": 0.01008,
+   "seconds": 5.383
+  },
+  "f0037.png": {
+   "ignored_fraction": 0.00785,
+   "seconds": 5.333
+  },
+  "f0038.png": {
+   "ignored_fraction": 0.00575,
+   "seconds": 5.149
+  },
+  "f0039.png": {
+   "ignored_fraction": 0.0,
+   "seconds": 4.98
+  },
+  "f0040.png": {
+   "ignored_fraction": 0.04982,
+   "seconds": 5.153
+  },
+  "f0041.png": {
+   "ignored_fraction": 0.18535,
+   "seconds": 5.03
+  },
+  "f0042.png": {
+   "ignored_fraction": 0.20677,
+   "seconds": 4.873
+  },
+  "f0043.png": {
+   "ignored_fraction": 0.23402,
+   "seconds": 5.02
+  },
+  "f0044.png": {
+   "ignored_fraction": 0.15054,
+   "seconds": 4.96
+  },
+  "f0045.png": {
+   "ignored_fraction": 0.20798,
+   "seconds": 4.975
+  },
+  "f0046.png": {
+   "ignored_fraction": 0.22766,
+   "seconds": 5.023
+  },
+  "f0047.png": {
+   "ignored_fraction": 0.1421,
+   "seconds": 5.058
+  },
+  "f0048.png": {
+   "ignored_fraction": 0.06023,
+   "seconds": 5.0
+  },
+  "f0049.png": {
+   "ignored_fraction": 0.07519,
+   "seconds": 5.054
+  },
+  "f0050.png": {
+   "ignored_fraction": 0.05825,
+   "seconds": 5.041
+  },
+  "f0051.png": {
+   "ignored_fraction": 0.01516,
+   "seconds": 4.976
+  },
+  "f0052.png": {
+   "ignored_fraction": 0.04996,
+   "seconds": 4.966
+  },
+  "f0053.png": {
+   "ignored_fraction": 0.15338,
+   "seconds": 5.064
+  },
+  "f0054.png": {
+   "ignored_fraction": 0.13196,
+   "seconds": 4.978
+  },
+  "f0055.png": {
+   "ignored_fraction": 0.12733,
+   "seconds": 4.854
+  },
+  "f0056.png": {
+   "ignored_fraction": 0.1031,
+   "seconds": 4.872
+  },
+  "f0057.png": {
+   "ignored_fraction": 0.17535,
+   "seconds": 4.949
+  },
+  "f0058.png": {
+   "ignored_fraction": 0.25145,
+   "seconds": 5.04
+  },
+  "f0059.png": {
+   "ignored_fraction": 0.27578,
+   "seconds": 5.116
+  },
+  "f0060.png": {
+   "ignored_fraction": 0.30754,
+   "seconds": 5.386
+  },
+  "f0061.png": {
+   "ignored_fraction": 0.32189,
+   "seconds": 5.809
+  },
+  "f0062.png": {
+   "ignored_fraction": 0.32215,
+   "seconds": 5.686
+  },
+  "f0063.png": {
+   "ignored_fraction": 0.35334,
+   "seconds": 5.996
+  },
+  "f0064.png": {
+   "ignored_fraction": 0.32613,
+   "seconds": 5.901
+  },
+  "f0065.png": {
+   "ignored_fraction": 0.2505,
+   "seconds": 5.801
+  },
+  "f0066.png": {
+   "ignored_fraction": 0.16949,
+   "seconds": 5.848
+  },
+  "f0067.png": {
+   "ignored_fraction": 0.10998,
+   "seconds": 5.764
+  },
+  "f0068.png": {
+   "ignored_fraction": 0.23525,
+   "seconds": 5.769
+  },
+  "f0069.png": {
+   "ignored_fraction": 0.19099,
+   "seconds": 5.907
+  },
+  "f0070.png": {
+   "ignored_fraction": 0.24646,
+   "seconds": 5.799
+  },
+  "f0071.png": {
+   "ignored_fraction": 0.32602,
+   "seconds": 5.871
+  },
+  "f0072.png": {
+   "ignored_fraction": 0.27885,
+   "seconds": 5.795
+  },
+  "f0073.png": {
+   "ignored_fraction": 0.34221,
+   "seconds": 5.795
+  },
+  "f0074.png": {
+   "ignored_fraction": 0.27966,
+   "seconds": 5.878
+  },
+  "f0075.png": {
+   "ignored_fraction": 0.29563,
+   "seconds": 5.851
+  },
+  "f0076.png": {
+   "ignored_fraction": 0.29834,
+   "seconds": 5.54
+  },
+  "f0077.png": {
+   "ignored_fraction": 0.33412,
+   "seconds": 5.682
+  },
+  "f0078.png": {
+   "ignored_fraction": 0.33505,
+   "seconds": 5.8
+  },
+  "f0079.png": {
+   "ignored_fraction": 0.30503,
+   "seconds": 5.648
+  },
+  "f0080.png": {
+   "ignored_fraction": 0.30904,
+   "seconds": 5.699
+  },
+  "f0081.png": {
+   "ignored_fraction": 0.34009,
+   "seconds": 5.852
+  },
+  "f0082.png": {
+   "ignored_fraction": 0.28853,
+   "seconds": 5.854
+  },
+  "f0083.png": {
+   "ignored_fraction": 0.46911,
+   "seconds": 5.595
+  },
+  "f0084.png": {
+   "ignored_fraction": 0.30096,
+   "seconds": 6.443
+  },
+  "f0085.png": {
+   "ignored_fraction": 0.36507,
+   "seconds": 5.92
+  },
+  "f0086.png": {
+   "ignored_fraction": 0.24445,
+   "seconds": 5.954
+  }
+ }
+}

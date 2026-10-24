@@ -1,7 +1,7 @@
 # Experiment: does masking moving people help SfM? (Gate 5, written before the runs)
 
-This plan was written and committed before any masked run existed. Results are added to this file
-afterwards in a separate section; the plan section is not edited.
+This plan was written and committed before any masked run existed (commit `f1051be`). Results are
+added to this file afterwards in a separate section; the plan section is not edited.
 
 ## Question
 
@@ -80,3 +80,61 @@ difference". With three seeds this is a coarse rule, deliberately conservative.
   larger than on the ETH3D DSLR data and are not comparable with it.
 - Masking can also remove useful static features on people-adjacent surfaces. The dilation of 6 px
   is a fixed choice, not tuned.
+
+---
+
+# Results (added after the runs; the plan above is unchanged)
+
+Raw rows: `benchmarks/results/masking/runs.jsonl`; aggregate: `summary.json`; segmentation log:
+`masks_log.json`. Reproduce with `benchmarks/masking/run_masking.py prepare`, `run --reps 3`,
+`summarize`. Host: Ryzen 9 8945HS, CPU only for both SfM and segmentation, 24 October 2026.
+
+86 frames, 85 with ground truth, 3 seeds per arm, all 6 runs completed.
+
+| Metric | unmasked mean (min-max) | masked mean (min-max) | Outside the seed ranges? |
+|--------|-------------------------|-----------------------|--------------------------|
+| Registered fraction | 1.000 (1.000-1.000) | 1.000 (1.000-1.000) | tie |
+| Camera error / path spread | 0.00848 (0.00838-0.00860) | 0.00852 (0.00851-0.00853) | **no** |
+| Camera error, absolute | 1.43 cm | 1.43 cm | no |
+| 3D points | 4,856 (4,843-4,864) | 4,605 (4,598-4,616) | yes, 5.2% fewer |
+| Mean reprojection error | 0.803 px (0.802-0.805) | 0.783 px (0.783-0.785) | yes, 2.5% lower |
+| Mean track length | 13.6 | 13.9 | yes |
+| SfM wall clock | 77.2 s (72.5-81.4) | 62.1 s (60.0-64.8) | yes, 20% faster |
+
+Masking cost: segmentation took **493 s** for the 86 frames on the CPU (5.7 s per frame). People
+cover 19.6% of the pixels on average (up to 46.9%); 77 of the 86 frames contain a mask.
+
+## Verdicts against the plan
+
+- **H1 (lower camera error): not supported.** The two arms differ by 0.00004 of the path spread,
+  far inside the 0.00022 seed range. There is no measurable difference.
+- **H2 (registers at least as many images): holds, but trivially.** Both arms register every image.
+- **H3 (masking cost exceeds the SfM time it saves): supported.** Masking saved about 15 s of SfM
+  per run and cost 493 s of segmentation, about 33 times more. This is CPU segmentation; a GPU run
+  was not measured, so no claim is made about it.
+
+## What this does and does not show
+
+- The unmasked baseline was already near the ceiling on this sequence: every image registers and
+  the camera path is within 1.4 cm, under 1% of its extent. There was little room for masking to
+  improve, so "no effect" here does not show that masking is useless on harder captures (low
+  overlap, many people, little static texture).
+- Fewer points, a slightly lower reprojection error and longer tracks are what removing features on
+  moving people would be expected to do. They are proxies: the ground-truth comparison shows no
+  accuracy change, so none is claimed.
+- The segmenter is not motion-aware. It masks every person, including people sitting still at their
+  desks later in the sequence, which removes static features too. A visual spot check of four
+  masks (not committed, the imagery is third-party) showed people covered well and, in the frame
+  with the most masking, some false blobs on ceiling scaffolding.
+- One sequence, one model, three seeds. The result stands for this setup only.
+
+## Deviations from the plan (all recorded, none changed a result)
+
+- The default safety cap of 80 images rejected the 86 frames (`TOO_MANY_IMAGES`, row kept in
+  `aborted_default_max_images.jsonl`). The cap is a limit on accepted input, not a reconstruction
+  setting; it was raised to 100 for this experiment. Nothing else differs from the defaults.
+- The first run that got past the cap failed in the ground-truth evaluation because the
+  ground-truth file I wrote began with a blank line (`aborted_gt_file_format.jsonl`). The writer is
+  fixed and now reads its own file back as a check; the reconstruction itself had succeeded.
+- The feasibility run (unmasked, seed 0) is the same row as the seed-0 unmasked result above; it
+  was not discarded or repeated.

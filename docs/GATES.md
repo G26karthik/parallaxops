@@ -97,10 +97,14 @@ reconstruction throughput.
   that every point arrived). **Not yet re-run:** the dense GPU job through the new format
   (`tests/e2e/test_dense.py` is updated but unexecuted), so there are no measured numbers for a
   249k-point cloud in the new viewer yet. This is WebGL multi-resolution streaming, not WebGPU.
-- Dynamic-object masking (tooling and plan done, experiment not run): the pipeline takes per-image
-  masks (`--masks`), a test shows COLMAP honours them, and `docs/EXPERIMENT_MASKING.md` was written
-  before any run. There are no masked-versus-unmasked results yet, so nothing is claimed about
-  whether masking helps.
+- Dynamic-object masking (done, honest null result): the pipeline takes per-image masks
+  (`--masks`), a test shows COLMAP honours them, and the plan in `docs/EXPERIMENT_MASKING.md` was
+  committed before any masked run. On TUM `walking_xyz` (86 frames, real people, motion-capture
+  ground truth, 3 seeds per arm, DETR person masks) masking made **no measurable difference to
+  camera accuracy** (1.43 cm both arms, 0.85% of the path) or to registration (all images in both
+  arms). It cut points by 5% and SfM time by 20% (15 s), but the CPU segmentation cost 493 s, so
+  it is not worth it on this sequence. The unmasked baseline was already at the ceiling, one
+  sequence only; raw rows in `benchmarks/results/masking/`.
 - Found while verifying: the audit hardening (Gate 3 section) had broken phase transitions for real
   jobs (every job stayed in PREPROCESSING). Unit tests and CI did not catch it because they drove
   phases with a different event type than the worker sends; the live end-to-end tests did, and the
