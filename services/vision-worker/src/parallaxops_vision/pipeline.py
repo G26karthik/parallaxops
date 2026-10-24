@@ -32,7 +32,7 @@ from .export import (
 )
 from .groundtruth import evaluate_poses, load_colmap_text_images
 from .metrics import SfMMetrics, compute_metrics
-from .prep import PreparedImage, prepare_images
+from .prep import PreparedImage, prepare_images, prepare_masks
 from .qc import QCReport, run_qc
 from .supervisor import SupervisedResult, run_supervised
 
@@ -110,6 +110,7 @@ def reconstruct(
     cancel: threading.Event | None = None,
     on_event: EventCb | None = None,
     gt_images_txt: Path | None = None,
+    masks_dir: Path | None = None,
     force: bool = False,
     keep_database: bool = False,
     render: bool = True,
@@ -192,6 +193,8 @@ def reconstruct(
         prepared = prepare_images(input_dir, qc, cfg, work / "images")
         timings["prepare_images"] = round(time.perf_counter() - t, 3)
         sub("prepare_images", "end", timings["prepare_images"])
+        if masks_dir is not None:
+            report["masking"] = prepare_masks(masks_dir, prepared, work / "masks")
         report["qc_summary"] = {
             "n_images": len(qc.images),
             "n_used": len(prepared),
@@ -213,6 +216,7 @@ def reconstruct(
         request = {
             "workspace": str(work),
             "images": str(work / "images"),
+            "masks": str(work / "masks") if masks_dir is not None else None,
             "config": cfg.model_dump(mode="json"),
             "remaining_seconds": max(
                 60, int(cfg.budgets.wall_clock_seconds - (time.perf_counter() - t_start))

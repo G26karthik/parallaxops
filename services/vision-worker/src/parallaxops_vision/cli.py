@@ -69,6 +69,12 @@ def reconstruct(
     ground_truth: Annotated[
         Path | None, typer.Option(help="COLMAP images.txt with GT poses (ETH3D) for accuracy eval.")
     ] = None,
+    masks: Annotated[
+        Path | None,
+        typer.Option(
+            help="Directory of <image name>.png masks (0 = ignore pixel) for SfM features."
+        ),
+    ] = None,
     force: Annotated[bool, typer.Option(help="Replace an existing output directory.")] = False,
     keep_database: Annotated[bool, typer.Option(help="Also publish COLMAP database.db.")] = False,
     no_render: Annotated[bool, typer.Option(help="Skip PNG renders.")] = False,
@@ -96,6 +102,7 @@ def reconstruct(
         cfg,
         on_event=on_event,
         gt_images_txt=ground_truth,
+        masks_dir=masks,
         force=force,
         keep_database=keep_database,
         render=not no_render,

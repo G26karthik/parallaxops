@@ -5,6 +5,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageOps
 from pydantic import BaseModel
 
@@ -68,3 +69,34 @@ def prepare_images(
             )
         )
     return out
+
+
+def prepare_masks(masks_dir: Path, prepared: list[PreparedImage], dest: Path) -> dict[str, float]:
+    """Match user masks to the prepared images and write them at the prepared size.
+
+    A mask for DSC_0001.JPG is DSC_0001.png in masks_dir: grayscale, 0 = ignore this pixel when
+    extracting features, anything else = keep. COLMAP wants <prepared name>.png at the prepared
+    image size. Images without a mask are used whole. Returns summary numbers for the report.
+    """
+    dest.mkdir(parents=True, exist_ok=True)
+    root = masks_dir.resolve()
+    ignored: list[float] = []
+    for p in prepared:
+        src = root / f"{Path(p.original_name).stem}.png"
+        if not src.is_file():
+            continue
+        with Image.open(src) as m:
+            keep = (
+                ImageOps.exif_transpose(m)
+                .convert("L")
+                .resize(p.prepared_size, Image.Resampling.NEAREST)
+            )
+        used = np.asarray(keep) > 0
+        Image.fromarray(used.astype("u1") * 255).save(dest / f"{p.safe_name}.png")
+        ignored.append(1 - float(used.mean()))
+    return {
+        "n_masks": len(ignored),
+        "n_images": len(prepared),
+        "mean_ignored_fraction": round(sum(ignored) / len(ignored), 4) if ignored else 0.0,
+        "max_ignored_fraction": round(max(ignored), 4) if ignored else 0.0,
+    }

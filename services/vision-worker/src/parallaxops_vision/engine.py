@@ -153,6 +153,8 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
     fx.sift.max_num_features = cfg.max_num_features
     reader = pycolmap.ImageReaderOptions()
     reader.camera_model = cfg.camera_model
+    if request.get("masks"):
+        reader.mask_path = request["masks"]  # features are not extracted where a mask is 0
     mode = pycolmap.CameraMode.SINGLE if cfg.single_camera else pycolmap.CameraMode.AUTO
     invocation["extract_features"] = {
         "extraction_options": opts_to_dict(fx),
