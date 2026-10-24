@@ -201,6 +201,23 @@ describe("state machine via worker events", () => {
     expect(job.metrics).toBeNull();
   });
 
+  it("moves a job through the phases the worker announces as state-carrying heartbeats", async () => {
+    // This is what the real worker sends (activities._forward); completion is refused unless the
+    // job really went through RECONSTRUCTING and EVALUATING.
+    const { c, id } = await queued();
+    await ev(id, "attempt_started");
+    expect((await ev(id, "heartbeat", { state: "RECONSTRUCTING" })).jobState).toBe(
+      "RECONSTRUCTING",
+    );
+    expect((await ev(id, "heartbeat", { state: "EVALUATING" })).jobState).toBe("EVALUATING");
+    const done = await ev(id, "completed", {
+      state: "COMPLETED",
+      payload: { metrics: { n_points3d: 3 } },
+    });
+    expect(done.jobState).toBe("COMPLETED");
+    expect((await c.get(`/v1/jobs/${id}`)).body.state).toBe("COMPLETED");
+  });
+
   it("marks an attempt whose worker vanished as failed when the next attempt starts", async () => {
     const { c, id } = await queued();
     await ev(id, "attempt_started", { workerId: "w-dead" });

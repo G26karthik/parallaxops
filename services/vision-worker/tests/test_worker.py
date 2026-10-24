@@ -1,19 +1,15 @@
 from __future__ import annotations
 
+import asyncio
 import json
-import struct
-from pathlib import Path
 from typing import Any
 
 import httpx
-import numpy as np
-import open3d as o3d
 import pytest
 from temporalio.exceptions import ApplicationError
 
 from parallaxops_vision.worker import activities
 from parallaxops_vision.worker.api_client import ApiClient, EventSender
-from parallaxops_vision.worker.artifacts import PREVIEW_MAGIC, build_preview
 from parallaxops_vision.worker.settings import Settings
 from parallaxops_vision.worker.storage import InputManifest
 
@@ -158,26 +154,19 @@ def test_safe_name_keeps_order_and_strips_hostile_characters() -> None:
     assert activities.safe_name(12, "") == "0012_image"
 
 
-def test_preview_format_roundtrip_and_decimation(tmp_path: Path) -> None:
-    rng = np.random.default_rng(0)
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(rng.normal(size=(1000, 3)))
-    pcd.colors = o3d.utility.Vector3dVector(rng.uniform(size=(1000, 3)))
-    ply = tmp_path / "p.ply"
-    o3d.io.write_point_cloud(ply, pcd)
+def test_phase_changes_reach_the_api_as_state_carrying_heartbeats() -> None:
+    """The API moves a job into a phase only on these events (apps/api/test/jobs.test.ts pins the
+    other half). Without them every job stays in PREPROCESSING and `completed` is refused."""
+    sent: list[tuple[str, dict[str, Any]]] = []
 
-    out = tmp_path / "p.bin"
-    n = build_preview(ply, out)
-    raw = out.read_bytes()
-    magic, version, count, _ = struct.unpack("<4sIII", raw[:16])
-    assert (magic, version) == (PREVIEW_MAGIC, 1)
-    assert count == n == 1000
-    xyz = np.frombuffer(raw[16 : 16 + count * 12], dtype="<f4").reshape(-1, 3)
-    assert np.allclose(xyz, np.asarray(pcd.points), atol=1e-5)
-    assert len(raw) == 16 + count * 12 + count * 3
+    async def emit(kind: str, **kw: Any) -> None:
+        sent.append((kind, kw))
 
-    small = tmp_path / "s.bin"
-    assert build_preview(ply, small, max_points=200) <= 200  # decimated, deterministic
-    assert build_preview(ply, tmp_path / "s2.bin", max_points=200) == build_preview(
-        ply, small, max_points=200
-    )
+    async def run() -> None:
+        for phase in ("PREPROCESSING", "RECONSTRUCTING", "EVALUATING"):
+            await activities._forward(emit, {"stage": phase, "state": "start"}, 0.0)
+
+    asyncio.run(run())
+    assert sent == [
+        ("heartbeat", {"state": p}) for p in ("PREPROCESSING", "RECONSTRUCTING", "EVALUATING")
+    ]

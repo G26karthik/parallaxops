@@ -370,8 +370,9 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
     const now = ctx.now();
     const cancelRequested = row.cancelRequestedAt !== null;
 
-    if (ev.type === "heartbeat") {
+    if (ev.type === "heartbeat" && !ev.state) {
       // Liveness only: stamp the row, store no event (one per ~5 s per job would grow without bound).
+      // A heartbeat that names a state is the worker announcing a phase change: handled below.
       if (!isTerminal(current))
         await tx.update(jobs).set({ lastHeartbeatAt: now }).where(eq(jobs.id, row.id));
       return { applied: true, jobState: current, cancelRequested };
@@ -503,6 +504,9 @@ export async function applyEvent(ctx: Ctx, ev: WorkerEvent): Promise<EventResult
           ctx.metrics.stageDuration.observe({ stage: ev.stage }, seconds);
         break;
       }
+      case "heartbeat":
+        patch.lastHeartbeatAt = now;
+        break;
       case "attempt_failed": {
         await tx
           .update(jobAttempts)
