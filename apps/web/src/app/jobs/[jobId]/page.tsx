@@ -22,7 +22,9 @@ function Artifacts({ jobId }: { jobId: string }) {
   if (q.isError) return <ErrorBox error={q.error} />;
   const label: Record<string, string> = {
     points_ply: "Sparse point cloud (PLY)",
-    points_preview: "Browser preview (binary)",
+    points_lod: "Browser point cloud (multi-resolution)",
+    points_dense_ply: "Dense point cloud (PLY)",
+    points_dense_lod: "Browser dense cloud (multi-resolution)",
     cameras: "Camera poses (JSON)",
     report: "Report (JSON)",
     manifest: "Manifest with checksums (JSON)",

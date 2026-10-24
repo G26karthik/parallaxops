@@ -199,9 +199,10 @@ export const ArtifactLinkSchema = ArtifactRefSchema.extend({
 export const SceneSchema = z.object({
   jobId: z.uuid(),
   pointCount: z.number().int(),
+  /** Multi-resolution point cloud (PXLD, coarse to fine, streamable). */
   pointsUrl: z.string(),
   camerasUrl: z.string(),
-  /** Present only when a dense point cloud was produced. */
+  /** Same format; present only when a dense point cloud was produced. */
   densePointsUrl: z.string().nullable(),
   densePointCount: z.number().int().nullable(),
   expiresAt: Iso,

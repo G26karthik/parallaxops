@@ -2,22 +2,13 @@
 
 from __future__ import annotations
 
-import math
 import shutil
-import struct
 import zipfile
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-import open3d as o3d
-
+from .lod import build_lod
 from .storage import Store
-
-PREVIEW_MAGIC = b"PXPT"
-PREVIEW_VERSION = 1
-PREVIEW_MAX_POINTS = 200_000
-DENSE_PREVIEW_MAX_POINTS = 300_000
 
 # kind -> (relative path inside the pipeline output dir, content type)
 FILES: dict[str, tuple[str, str]] = {
@@ -32,24 +23,6 @@ FILES: dict[str, tuple[str, str]] = {
     "render_metrics": ("renders/metrics.png", "image/png"),
     "engine_log": ("logs/engine.log", "text/plain"),
 }
-
-
-def build_preview(ply: Path, out: Path, max_points: int = PREVIEW_MAX_POINTS) -> int:
-    """Browser-friendly point cloud: header + float32 xyz + uint8 rgb, decimated deterministically.
-
-    Layout: "PXPT" | u32 version | u32 count | u32 reserved | count*3 float32 | count*3 uint8.
-    Sparse clouds are tiny, so this is usually a single level; the cap protects dense output later.
-    """
-    pcd = o3d.io.read_point_cloud(ply)
-    if len(pcd.points) > max_points:
-        pcd = pcd.uniform_down_sample(math.ceil(len(pcd.points) / max_points))
-    xyz = np.asarray(pcd.points, dtype="<f4")
-    rgb = (np.clip(np.asarray(pcd.colors), 0, 1) * 255).round().astype("u1")
-    with out.open("wb") as f:
-        f.write(PREVIEW_MAGIC + struct.pack("<III", PREVIEW_VERSION, len(xyz), 0))
-        f.write(xyz.tobytes())
-        f.write(rgb.tobytes())
-    return len(xyz)
 
 
 def zip_dir(src: Path, out: Path) -> None:
@@ -67,16 +40,14 @@ def publish(store: Store, out_dir: Path, prefix: str, scratch: Path) -> list[dic
         p = out_dir / rel
         if p.exists():
             staged[kind] = (p, ctype)
-    preview = scratch / "points_preview.bin"
-    build_preview(out_dir / "points_sparse.ply", preview)
-    staged["points_preview"] = (preview, "application/octet-stream")
-    if (out_dir / "points_dense.ply").exists():
-        # Dense clouds are large: the browser gets a deterministic decimated level (<= 300k points).
-        dense_preview = scratch / "points_dense_preview.bin"
-        build_preview(
-            out_dir / "points_dense.ply", dense_preview, max_points=DENSE_PREVIEW_MAX_POINTS
-        )
-        staged["points_dense_preview"] = (dense_preview, "application/octet-stream")
+    # Multi-resolution streams for the browser (see lod.py): coarse first, nothing is thrown away.
+    for kind, ply, name in (
+        ("points_lod", "points_sparse.ply", "points_lod.bin"),
+        ("points_dense_lod", "points_dense.ply", "points_dense_lod.bin"),
+    ):
+        if (out_dir / ply).exists():
+            build_lod(out_dir / ply, scratch / name)
+            staged[kind] = (scratch / name, "application/octet-stream")
     sparse = out_dir / "colmap" / "sparse" / "0"
     if sparse.exists():
         archive = scratch / "colmap_sparse.zip"

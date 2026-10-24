@@ -50,14 +50,17 @@ def test_dense_job_end_to_end() -> None:
     assert 0 < dense["peak_vram_mib"] < 8188
     assert {"dense_patch_match", "dense_fusion"} <= {s["name"] for s in job["stages"]}
     kinds = {a["kind"] for a in t.call("GET", f"/v1/jobs/{job_id}/artifacts").json()}
-    assert {"points_dense_ply", "points_dense_preview", "points_ply"} <= kinds
+    assert {"points_dense_ply", "points_dense_lod", "points_ply"} <= kinds
 
     scene = t.call("GET", f"/v1/jobs/{job_id}/scene").json()
     assert scene["densePointsUrl"] and scene["densePointCount"] == dense["n_points"]
-    prev = httpx.get(scene["densePointsUrl"], timeout=120).content
-    magic, version, count, _ = struct.unpack("<4sIII", prev[:16])
-    assert magic == b"PXPT" and version == 1 and 0 < count <= 300_000
-    assert len(prev) == 16 + count * 15  # float32 xyz + uint8 rgb
+    lod = httpx.get(scene["densePointsUrl"], timeout=120).content
+    magic, version, count, levels = struct.unpack("<4sIII", lod[:16])
+    # The browser file keeps every dense point (nothing is decimated; levels only reorder them).
+    assert magic == b"PXLD" and version == 1 and count == dense["n_points"]
+    ends = struct.unpack_from(f"<{levels}I", lod, 40)
+    assert list(ends) == sorted(set(ends)) and ends[-1] == count and levels > 3
+    assert len(lod) == -(-(40 + 4 * levels) // 16) * 16 + count * 16
 
     EVIDENCE.mkdir(parents=True, exist_ok=True)
     (EVIDENCE / "dense_job.json").write_text(
@@ -67,7 +70,9 @@ def test_dense_job_end_to_end() -> None:
                 "timeline": seen,
                 "sparse_points": job["metrics"]["n_points3d"],
                 "dense": dense,
-                "preview_points": count,
+                "browser_points": count,
+                "browser_levels": list(ends),
+                "browser_file_bytes": len(lod),
                 "stages": {s["name"]: s["seconds"] for s in job["stages"]},
             },
             indent=2,

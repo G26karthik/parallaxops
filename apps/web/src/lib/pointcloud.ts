@@ -1,4 +1,4 @@
-/** Decoding and framing of the worker's point-cloud preview (see worker/artifacts.py). */
+/** Framing and display transforms for the point cloud (decoding lives in lod.ts). */
 
 export interface Preview {
   count: number;
@@ -11,18 +11,6 @@ export interface CameraPose {
   /** cam_from_world rotation (row-major 3x3) */
   R: number[][];
   center: [number, number, number];
-}
-
-export function parsePreview(buf: ArrayBuffer): Preview {
-  const dv = new DataView(buf);
-  const magic = String.fromCharCode(dv.getUint8(0), dv.getUint8(1), dv.getUint8(2), dv.getUint8(3));
-  if (magic !== "PXPT") throw new Error("Not a ParallaxOps point-cloud preview");
-  const version = dv.getUint32(4, true);
-  if (version !== 1) throw new Error(`Unsupported preview version ${version}`);
-  const count = dv.getUint32(8, true);
-  const xyz = new Float32Array(buf, 16, count * 3);
-  const rgb = new Uint8Array(buf, 16 + count * 12, count * 3);
-  return { count, xyz, rgb };
 }
 
 export function parseCameras(json: {

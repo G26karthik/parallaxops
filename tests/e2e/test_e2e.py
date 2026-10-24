@@ -208,7 +208,7 @@ def test_full_reconstruction_job_produces_real_artifacts(scene) -> None:  # type
     arts = {a["kind"]: a for a in t.call("GET", f"/v1/jobs/{job_id}/artifacts").json()}
     assert {
         "points_ply",
-        "points_preview",
+        "points_lod",
         "cameras",
         "report",
         "manifest",
@@ -220,10 +220,12 @@ def test_full_reconstruction_job_produces_real_artifacts(scene) -> None:  # type
         and hashlib.sha256(ply.content).hexdigest() == arts["points_ply"]["sha256"]
     )
     assert ply.content.startswith(b"ply")
-    prev = httpx.get(arts["points_preview"]["url"], timeout=60).content
-    magic, version, count, _ = struct.unpack("<4sIII", prev[:16])
-    assert magic == b"PXPT" and version == 1 and count == m["n_points3d"]
-    assert len(prev) == 16 + count * 3 * 4 + count * 3
+    lod = httpx.get(arts["points_lod"]["url"], timeout=60).content
+    magic, version, count, levels = struct.unpack("<4sIII", lod[:16])
+    assert magic == b"PXLD" and version == 1 and count == m["n_points3d"]
+    ends = struct.unpack_from(f"<{levels}I", lod, 40)
+    assert list(ends) == sorted(set(ends)) and ends[-1] == count
+    assert len(lod) == -(-(40 + 4 * levels) // 16) * 16 + count * 16
     cams = httpx.get(arts["cameras"]["url"], timeout=30).json()
     assert len(cams["images"]) == m["n_registered"]
     scene_info = t.call("GET", f"/v1/jobs/{job_id}/scene").json()

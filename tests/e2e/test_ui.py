@@ -205,6 +205,16 @@ def test_full_user_journey(page: Page, photos: list[Path], noise: list[Path]) ->
     expect(page.get_by_text("Measured metrics")).to_be_visible()
     canvas = page.locator("canvas")
     expect(canvas).to_be_visible(timeout=60_000)
+    # The cloud is a multi-resolution stream: coarse level first, then refined to every point.
+    cloud = page.locator("[data-levels]")
+    expect(cloud).to_have_attribute("data-done-ms", re.compile(r"^\d+$"), timeout=60_000)
+    levels = [int(v) for v in (cloud.get_attribute("data-levels") or "").split(",")]
+    total = int(cloud.get_attribute("data-total") or 0)
+    assert len(levels) >= 3 and levels[-1] == total > 1000, levels
+    assert int(cloud.get_attribute("data-loaded") or 0) == total
+    assert int(cloud.get_attribute("data-first-ms") or 0) <= int(
+        cloud.get_attribute("data-done-ms") or 0
+    )
     assert "points" in (canvas.get_attribute("aria-label") or "")
     page.wait_for_timeout(1500)
     # The 3D view must actually contain rendered points, not just an empty canvas.

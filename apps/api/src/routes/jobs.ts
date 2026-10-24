@@ -205,13 +205,13 @@ export function jobRoutes(app: FastifyInstance, ctx: Ctx) {
           "The 3D scene exists only for completed jobs.",
         );
       const got = await links(req.tenantId, req.params.jobId, [
-        "points_preview",
-        "points_dense_preview",
+        "points_lod",
+        "points_dense_lod",
         "cameras",
       ]);
-      const pts = got.find((a) => a.kind === "points_preview");
+      const pts = got.find((a) => a.kind === "points_lod");
       const cams = got.find((a) => a.kind === "cameras");
-      const dense = got.find((a) => a.kind === "points_dense_preview");
+      const dense = got.find((a) => a.kind === "points_dense_lod");
       if (!pts || !cams)
         throw new AppError(404, "NOT_FOUND", "Scene artifacts are missing or expired.");
       const metrics = (job.metrics ?? {}) as { n_points3d?: number; dense?: { n_points?: number } };

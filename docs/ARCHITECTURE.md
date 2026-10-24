@@ -47,8 +47,29 @@ flowchart LR
    timeline.
 4. The workflow reports the terminal event (`completed`, `failed`, `cancelled`) through a retrying
    activity, so the result reaches the API even if the worker died right after finishing.
-5. The browser polls the job, then fetches presigned URLs for the point-cloud preview and camera
-   poses and renders them.
+5. The browser polls the job, then fetches presigned URLs for the point cloud and camera poses and
+   renders them as a stream (next section).
+
+## Point-cloud streaming (PXLD)
+
+The worker writes each cloud as one multi-resolution file (`worker/lod.py`, decoded by
+`apps/web/src/lib/lod.ts`). Points are ordered coarse to fine: level k keeps, among the points not
+used yet, the one nearest each occupied cell of a 16, 32, ..., 1024 grid over the bounding cube, and
+the rest forms the last level. Levels are disjoint, so the file holds **every** point; nothing is
+decimated away. Every prefix that ends on a level boundary covers every region the full cloud
+covers (tested), so the viewer can:
+
+- draw level 0 after the first few kilobytes and refine while the download runs (plain `fetch`
+  stream; no HTTP Range requests, so no extra CORS headers on the object store);
+- draw only a coarse prefix while the camera moves and the full detail once it has been still for
+  180 ms;
+- stop reading at a level boundary once its budget (3 million points) is reached;
+- let the user pick the detail level.
+
+Layout, limits and the golden file that keeps the Python encoder and the TypeScript decoder in step
+are documented in `worker/lod.py` and tested in `services/vision-worker/tests/test_lod.py` and
+`apps/web/test/lod.test.ts`. This is multi-resolution streaming, not WebGPU rendering: the viewer
+uses WebGL through Three.js.
 
 ## Key decisions (see `docs/adr/`)
 
