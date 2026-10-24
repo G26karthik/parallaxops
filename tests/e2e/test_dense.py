@@ -62,6 +62,13 @@ def test_dense_job_end_to_end() -> None:
     assert list(ends) == sorted(set(ends)) and ends[-1] == count and levels > 3
     assert len(lod) == -(-(40 + 4 * levels) // 16) * 16 + count * 16
 
+    # Not evidence: lets benchmarks/measure_viewer.py open this exact job in a browser afterwards.
+    scratch = HOME / "scratch"
+    scratch.mkdir(parents=True, exist_ok=True)
+    (scratch / "last_dense_job.json").write_text(
+        json.dumps({"tenant": t.id, "job": job_id}), encoding="utf-8"
+    )
+
     EVIDENCE.mkdir(parents=True, exist_ok=True)
     (EVIDENCE / "dense_job.json").write_text(
         json.dumps(

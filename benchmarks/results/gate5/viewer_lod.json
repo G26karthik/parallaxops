@@ -1,0 +1,28 @@
+{
+  "job_points_total": 248468,
+  "levels_cumulative": [
+    171,
+    720,
+    2420,
+    7695,
+    22491,
+    57516,
+    125496,
+    248468
+  ],
+  "sparse_cloud": {
+    "total": "5288",
+    "firstMs": "105",
+    "doneMs": "106"
+  },
+  "dense_first_level_ms": 106,
+  "dense_all_points_ms": 147,
+  "drawn_at_rest": 248468,
+  "drawn_while_orbiting": 125496,
+  "drawn_after_settling": 248468,
+  "orbit_step_ms_detail_full": 17.3,
+  "orbit_step_ms_detail_level3": 16.5,
+  "detail_level3_label": "Level 3 (2,420 points)",
+  "detail_level3_points": 2420,
+  "renderer": "headless Chromium, SwiftShader software GL, local object store"
+}

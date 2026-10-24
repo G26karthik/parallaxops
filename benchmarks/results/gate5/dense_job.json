@@ -1,56 +1,67 @@
 {
-  "wall_seconds": 389.7,
+  "wall_seconds": 413.0,
   "timeline": [
     [
       0.0,
       "QUEUED"
     ],
     [
-      1.0,
+      0.5,
       "PREPROCESSING"
     ],
     [
-      2.0,
+      1.5,
       "RECONSTRUCTING"
     ],
     [
-      43.5,
+      54.1,
       "EVALUATING"
     ],
     [
-      389.7,
+      413.0,
       "COMPLETED"
     ]
   ],
-  "sparse_points": 5280,
+  "sparse_points": 5288,
   "dense": {
     "note": "Dense MVS point cloud (geometrically consistent depth fusion). Not a mesh; scale arbitrary.",
     "colmap": "COLMAP 4.2.1 (Commit bd1fcf6 on 2026-09-29 with CUDA, boost hash maps)",
-    "n_points": 249005,
-    "peak_vram_mib": 678,
-    "total_seconds": 343.88,
+    "n_points": 248468,
+    "peak_vram_mib": 1650,
+    "total_seconds": 355.27,
     "max_image_size": 1000,
     "stages_seconds": {
-      "dense_fusion": 3.16,
+      "dense_fusion": 4.81,
       "dense_undistort": 0.52,
-      "dense_patch_match": 340.06
+      "dense_patch_match": 349.76
     },
     "geom_consistency": true
   },
-  "preview_points": 249005,
+  "browser_points": 248468,
+  "browser_levels": [
+    171,
+    720,
+    2420,
+    7695,
+    22491,
+    57516,
+    125496,
+    248468
+  ],
+  "browser_file_bytes": 3975568,
   "stages": {
-    "download_inputs": 0.146,
-    "qc": 0.418,
-    "prepare_images": 0.216,
-    "feature_extraction": 6.183,
-    "feature_matching": 28.899,
-    "sparse_mapping": 5.322,
-    "metrics": 0.391,
-    "export": 0.046,
-    "dense_reconstruction": 343.934,
+    "download_inputs": 0.207,
+    "qc": 0.489,
+    "prepare_images": 0.294,
+    "feature_extraction": 6.504,
+    "feature_matching": 34.258,
+    "sparse_mapping": 10.228,
+    "metrics": 0.687,
+    "export": 0.077,
+    "dense_reconstruction": 355.327,
     "dense_undistort": 0.52,
-    "dense_patch_match": 340.06,
-    "dense_fusion": 3.16,
-    "publish_artifacts": 0.418
+    "dense_patch_match": 349.76,
+    "dense_fusion": 4.81,
+    "publish_artifacts": 1.389
   }
 }
