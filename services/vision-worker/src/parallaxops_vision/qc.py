@@ -7,6 +7,7 @@ measure scene coverage or guarantee reconstructability; the SfM result is the on
 from __future__ import annotations
 
 import hashlib
+from itertools import pairwise
 from pathlib import Path
 
 import cv2
@@ -24,6 +25,7 @@ _TAG_FOCAL35 = 0xA405
 _TAG_MAKE = 0x010F
 _TAG_MODEL = 0x0110
 _ANALYSIS_LONG_SIDE = 1024
+_UNORDERED_RATIO = 0.9  # between the slowest ordered capture measured (0.83) and shuffled (0.93+)
 
 
 class ImageQC(BaseModel):
@@ -101,6 +103,19 @@ def _dhash(gray: np.ndarray) -> str:
 
 def hamming(a: str, b: str) -> int:
     return (int(a, 16) ^ int(b, 16)).bit_count()
+
+
+def order_ratio(dhashes: list[str]) -> float:
+    """Mean hash distance between neighbours in name order, over the mean between all pairs.
+
+    Near 1 means neighbours look no more alike than random pairs, so the names do not follow
+    capture order. Measured on real captures: ETH3D terrace in order 0.83, TUM walking_xyz in
+    order 0.54; the same sets shuffled 20 times gave 0.93 to 1.08.
+    """
+    adjacent = [hamming(a, b) for a, b in pairwise(dhashes)]
+    pairs = [hamming(a, b) for i, a in enumerate(dhashes) for b in dhashes[i + 1 :]]
+    mean_all = sum(pairs) / len(pairs)
+    return (sum(adjacent) / len(adjacent)) / mean_all if mean_all else 1.0
 
 
 def _exif_numbers(img: Image.Image) -> tuple[float | None, float | None, str | None]:
@@ -256,6 +271,16 @@ def run_qc(input_dir: Path, cfg: ReconstructionConfig) -> QCReport:
         )
     if n_ok < 15:
         warnings.append("Fewer than 15 images: reconstructions are fragile; 15-35 is recommended.")
+    # Above 60 images matching is sequential: each image is matched only with its neighbours in
+    # name order. If the names were shuffled, most true overlaps are never tried.
+    if len(images) > 60 and cfg.matching in ("auto", "sequential"):
+        ratio = order_ratio([i.dhash for i in images])
+        if ratio > _UNORDERED_RATIO:
+            warnings.append(
+                f"{len(images)} images are matched in filename order, but the filenames do not "
+                f"look like capture order (neighbour similarity ratio {ratio:.2f}). Rename the "
+                "files so they sort in the order they were taken, or expect missing overlaps."
+            )
     return QCReport(
         images=images,
         rejected=rejected,
