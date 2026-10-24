@@ -46,10 +46,8 @@ def tool_env() -> dict[str, str]:
 
 
 def ts_steps(fast: bool) -> list[tuple[str, list[str], Path]]:
-    if (
-        not (ROOT / "pnpm-workspace.yaml").exists()
-        or shutil.which("pnpm", path=tool_env()["PATH"]) is None
-    ):
+    # A workspace without pnpm is a failure (main() reports it), never a quietly shorter check.
+    if not (ROOT / "pnpm-workspace.yaml").exists():
         return []
     out = [
         ("biome (lint+format)", ["pnpm", "exec", "biome", "check", "."], ROOT),
@@ -118,10 +116,8 @@ def main() -> int:
             if cmd[0] in ("pnpm", "actionlint")
             else cmd[0]
         )
-        if exe is None and cmd[0] == "actionlint":
-            print(
-                "FAIL actionlint: not installed. See docs/CI.md for the one-line install."
-            )
+        if exe is None and cmd[0] in ("pnpm", "actionlint"):
+            print(f"FAIL {name}: {cmd[0]} not installed. See docs/CI.md.")
             failed.append(name)
             continue
         res = subprocess.run(
